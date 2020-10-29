@@ -55,7 +55,7 @@ canvas.addEventListener('mousedown', function(e) {
     for(let i = 0; i < paths.length; i++){
         if(ctx.isPointInPath(paths[i], e.offsetX, e.offsetY)){
             keyIndex = i;
-            calcKey(keyIndex)
+            calcKey(keyIndex, true)
             console.log(key)
         }
     }
@@ -66,53 +66,59 @@ canvas.addEventListener('mousedown', function(e) {
 });
 
 //updates key based on given index
-function calcKey(index){
+function calcKey(index, select){
 
     switch(index){
 
         case 0:
-            key = "C"
+            theKey = "C"
             break;
         case 1:
-            key = "G"
+            theKey = "G"
             break;
         case 2:
-            key = "D"
+            theKey = "D"
             break;
         case 3:
-            key = "A"
+            theKey = "A"
             break;
         case 4:
-            key = "E"
+            theKey = "E"
             break;
         case 5:
-            key = "B"
+            theKey = "B"
             break;
         case 6:
-            key = "Gb"
+            theKey = "Gb"
             break;
         case 7:
-            key = "Db"
+            theKey = "Db"
             break;
         case 8:
-            key = "Ab"
+            theKey = "Ab"
             break;
         case 9:
-            key = "Eb"
+            theKey = "Eb"
             break;
         case 10:
-            key = "Bb"
+            theKey = "Bb"
             break;
         case 11:
-            key = "F"
+            theKey = "F"
             break;
         
         default:
-            key = "C"
+            theKey = "C"
             break;
 
 
     }
+    if(select){
+        key = theKey
+    }
+
+    return theKey
+    
 
 }
 
@@ -177,11 +183,55 @@ function drawKeyWheel(){
         ctx.fill(paths[i])
     }
 
+    //draw the names of keys
+    let angle = 0 - 6 * Math.PI/12
+
+    for(let i = 0; i < 12; i++){
+
+        ctx.font = "30px Arial"
+
+        let x = keyX + 155 * Math.cos(angle)
+        let y = keyY + 155 * Math.sin(angle) + 10 
+
+        ctx.fillStyle = "black"
+        ctx.textAlign = "center"
+        ctx.fillText(calcKey(i, false), x, y)
+
+        angle += Math.PI/6
+    }
+
+
+}
+
+function drawStaff(){
+
+    ctx.beginPath()
+    ctx.moveTo(canvas.width/2.5, 3 * canvas.height/12)
+    ctx.lineTo(canvas.width/2.5, canvas.height - 1.5 * canvas.height/6)
+
+    let startY =  3 * canvas.height/12
+    let height = (canvas.height - 1.5 * canvas.height/6) - 3 * canvas.height/12
+
+    for(let i = 0; i < 10; i++){
+        ctx.moveTo(canvas.width/2.5, startY)
+        ctx.lineTo(canvas.width - canvas.width/8, startY)
+
+        startY += (height)/10
+        if(i == 4){
+            startY += (height)/10
+        }
+    }
+
+    ctx.stroke()
+
+
+
 
 }
 
 function drawCanvas(){
     ctx.fillStyle = "white"
+    ctx.textAlign = "left"
     ctx.rect(0,0,canvas.width, canvas.height)
     ctx.fill()
 
@@ -193,7 +243,10 @@ function drawCanvas(){
 
     ctx.fillStyle = "black"
     ctx.font = "30px Arial"
+    ctx.textAlign = "left"
     ctx.fillText("Key: " + key, 50, canvas.height - 50)
+
+    drawStaff()
 }
 
 //create a global object to track animation changes
