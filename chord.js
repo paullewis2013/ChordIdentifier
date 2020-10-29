@@ -22,6 +22,34 @@ var hovered = null;
 
 drawKeyWheel()
 
+function preloadImages(srcs, imgs) {
+    
+    console.log("preloading Images")
+    
+    var img;
+    var remaining = srcs.length;
+    for (var i = 0; i < srcs.length; i++) {
+        img = new Image();
+        img.onload = function() {
+            --remaining;
+            if (remaining <= 0) {
+                setInterval(drawFrame, 80)
+            }
+        };
+        img.src = srcs[i];
+        imgs.push(img);
+    }
+}
+
+//any new image has to be added here and you need to append it otherwise it shifts all other indices
+var imageSrcs = ["assets/treble.svg", 
+                "assets/bass.svg"
+                ];
+
+var images = [];
+
+preloadImages(imageSrcs, images);
+
 canvas.addEventListener('mousemove', function(e) {
 
     // console.log("moved")
@@ -224,13 +252,14 @@ function drawStaff(){
 
     ctx.stroke()
 
-
+    ctx.drawImage(images[0], canvas.width/2.66, 3 * canvas.height/12 - 0.3 *  height/10, 200, 5 * height/10)
+    ctx.drawImage(images[1], canvas.width/2.4, 3 * canvas.height/12 + 6 * height/10, 100, 3 * height/10)
 
 
 }
 
 function drawCanvas(){
-    ctx.fillStyle = "white"
+    ctx.fillStyle = "#F9F1F1"
     ctx.textAlign = "left"
     ctx.rect(0,0,canvas.width, canvas.height)
     ctx.fill()
@@ -273,4 +302,4 @@ function drawFrame(){
     drawCanvas()
 }
 
-setInterval(drawFrame, 80)
+
