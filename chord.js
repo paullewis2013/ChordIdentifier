@@ -25,12 +25,14 @@ drawKeyWheel()
 canvas.addEventListener('mousemove', function(e) {
 
     // console.log("moved")
+    let found = false;
 
     //loop through all sectors of key wheel
     for(let i = 0; i < paths.length; i++){
 
         if(ctx.isPointInPath(paths[i], e.offsetX, e.offsetY)){
             console.log(i)
+            found = true;
 
             if(hovered != i){
                 expanding = true
@@ -40,7 +42,9 @@ canvas.addEventListener('mousemove', function(e) {
             
         }
     }
-
+    if(!found){
+        hovered = null;
+    }
 
 });
 
@@ -186,6 +190,10 @@ function drawCanvas(){
     ctx.fillText("Chord Identifier", 50, 50)
 
     drawKeyWheel()
+
+    ctx.fillStyle = "black"
+    ctx.font = "30px Arial"
+    ctx.fillText("Key: " + key, 50, canvas.height - 50)
 }
 
 //create a global object to track animation changes
