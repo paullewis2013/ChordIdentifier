@@ -40,8 +40,8 @@ var minorButtonY;
 var enharmonicButtonX;
 var enharmonicButtonY;
 
-var sharps = false;
-var flats = false;
+var numSharps = 0;
+var numFlats = 0;
 var notes = [];
 
 drawKeyWheel()
@@ -84,7 +84,6 @@ canvas.addEventListener('mousemove', function(e) {
     for(let i = 0; i < paths.length; i++){
 
         if(ctx.isPointInPath(paths[i], e.offsetX * scale, e.offsetY * scale)){
-            console.log(i)
             found = true;
 
             if(hovered != i){
@@ -122,7 +121,7 @@ canvas.addEventListener('mousedown', function(e) {
         if(ctx.isPointInPath(paths[i], e.offsetX * scale, e.offsetY * scale)){
             keyIndex = i;
             calcKey(keyIndex, true)
-            console.log(key)
+            // console.log(key)
         }
     }
 
@@ -134,6 +133,8 @@ canvas.addEventListener('mousedown', function(e) {
         }else{
             showMinor = true;
         }
+
+        calcKey(keyIndex, true)
         
     }
     if(ctx.isPointInPath(enharmonicButtonPath, e.offsetX * scale, e.offsetY * scale)){
@@ -143,6 +144,8 @@ canvas.addEventListener('mousedown', function(e) {
         }else{
             showEnharmonics = true;
         }
+
+        calcKey(keyIndex, true)
         
     }
 
@@ -150,6 +153,9 @@ canvas.addEventListener('mousedown', function(e) {
 
 //updates key based on given index
 function calcKey(index, select){
+
+    let sharps = 0;
+    let flats = 0;
 
     switch(index){
 
@@ -160,6 +166,9 @@ function calcKey(index, select){
                 theKey = "Am"
             }
             
+            sharps = 0;
+            flats = 0;
+
             break;
         case 1:
             if(!showMinor){
@@ -167,6 +176,10 @@ function calcKey(index, select){
             }else{
                 theKey = "Em"
             }
+
+            sharps = 1;
+            flats = 0;
+
             break;
         case 2:
             if(!showMinor){
@@ -174,6 +187,10 @@ function calcKey(index, select){
             }else{
                 theKey = "Bm"
             }
+
+            sharps = 2;
+            flats = 0;
+
             break;
         case 3:
             if(!showMinor){
@@ -181,6 +198,10 @@ function calcKey(index, select){
             }else{
                 theKey = "F#m"
             }
+
+            sharps = 3;
+            flats = 0;
+
             break;
         case 4:
             if(!showMinor){
@@ -188,39 +209,82 @@ function calcKey(index, select){
             }else{
                 theKey = "C#m"
             }
+
+            sharps = 4;
+            flats = 0;
+
             break;
         case 5:
             if(!showMinor && !showEnharmonics){
                 theKey = "B"
+
+                sharps = 5;
+                flats = 0;
+
             }else if(!showMinor && showEnharmonics){
                 theKey = "Cb"
+
+                sharps = 0;
+                flats = 7;
+
             }else if(showMinor && !showEnharmonics){
                 theKey = "G#m"
+
+                sharps = 5
+                flats = 0;
+
             }else{
                 theKey = "Abm"
+
+                sharps = 0;
+                flats = 7;
             }
             
             break;
         case 6:
             if(!showMinor && !showEnharmonics){
                 theKey = "Gb"
+
+                sharps = 0;
+                flats = 6;
             }else if(!showMinor && showEnharmonics){
                 theKey = "F#"
+
+                sharps = 6;
+                flats = 0;
             }else if(showMinor && !showEnharmonics){
                 theKey = "D#m"
+
+                sharps = 6;
+                flats = 0;
             }else{
                 theKey = "Ebm"
+
+                sharps = 0;
+                flats = 6;
             }
             break;
         case 7:
             if(!showMinor && !showEnharmonics){
                 theKey = "Db"
+
+                sharps = 0;
+                flats = 5;
             }else if(!showMinor && showEnharmonics){
                 theKey = "C#"
+
+                sharps = 7;
+                flats = 0;
             }else if(showMinor && !showEnharmonics){
                 theKey = "A#m"
+
+                sharps = 7;
+                flats = 0;
             }else{
                 theKey = "Bbm"
+
+                sharps = 0;
+                flats = 5;
             }
             break;
         case 8:
@@ -229,6 +293,10 @@ function calcKey(index, select){
             }else{
                 theKey = "Fm"
             }
+
+            sharps = 0;
+            flats = 4;
+
             break;
         case 9:
             if(!showMinor){
@@ -236,6 +304,9 @@ function calcKey(index, select){
             }else{
                 theKey = "Cm"
             }
+
+            sharps = 0;
+            flats = 3;
             break;
         case 10:
             if(!showMinor){
@@ -243,6 +314,9 @@ function calcKey(index, select){
             }else{
                 theKey = "Gm"
             }
+
+            sharps = 0;
+            flats = 2;
             break;
         case 11:
             if(!showMinor){
@@ -250,16 +324,26 @@ function calcKey(index, select){
             }else{
                 theKey = "Dm"
             }
+
+            sharps = 0;
+            flats = 1;
             break;
         
         default:
             theKey = "C"
+
+            sharps = 0;
+            flats = 0;
             break;
 
 
     }
     if(select){
         key = theKey
+        numSharps = sharps
+        numFlats = flats
+
+        console.log("sharps:" + numSharps + " Flats:" + numFlats)
     }
 
     return theKey
@@ -336,8 +420,8 @@ function drawKeyWheel(){
 
         ctx.font = "30px Arial"
 
-        let x = keyX + 155 * Math.cos(angle)
-        let y = keyY + 155 * Math.sin(angle) + 10 
+        let x = keyX + 160 * Math.cos(angle)
+        let y = keyY + 160 * Math.sin(angle) + 10 
 
         ctx.fillStyle = "black"
         ctx.textAlign = "center"
@@ -453,31 +537,71 @@ function drawKeyButtons(){
 
 function drawStaff(){
 
+    //define borders
+    let startX = canvas.width/(2.5 * scale)
+    let endX = canvas.width/scale - canvas.width/(8 * scale)
+    let startY =  3 * canvas.height/(12 * scale)
+    let height = (canvas.height/scale - 1.5 * canvas.height/(6 * scale)) - 3 * canvas.height/(12 * scale)
+    let width = endX - startX;
+
+    //make two white boxes behind staff
+    ctx.fillStyle = "white"
+    ctx.rect(startX, startY, width, height * .4)
+    ctx.fill()
+
+    ctx.rect(startX, startY + height * .6, width, height * .4)
+    ctx.fill()
+
+
+    //draw lines on top
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
 
+    //draw left side vertical line
     ctx.beginPath()
-    ctx.moveTo(canvas.width/(2.5 * scale), 3 * canvas.height/(12 * scale))
-    ctx.lineTo(canvas.width/(2.5 * scale), canvas.height/scale - 1.5 * canvas.height/(6 * scale))
+    ctx.moveTo(startX, 3 * canvas.height/(12 * scale))
+    ctx.lineTo(startX, canvas.height/scale - 1.5 * canvas.height/(6 * scale))
 
-    let startY =  3 * canvas.height/(12 * scale)
-    let height = (canvas.height/scale - 1.5 * canvas.height/(6 * scale)) - 3 * canvas.height/(12 * scale)
-
+    //draw horizontal lines in staff
     for(let i = 0; i < 10; i++){
-        ctx.moveTo(canvas.width/(2.5 * scale), startY)
-        ctx.lineTo(canvas.width/scale - canvas.width/(8 * scale), startY)
+        ctx.moveTo(startX, startY)
+        ctx.lineTo(endX, startY)
 
         startY += (height)/10
         if(i == 4){
             startY += (height)/10
         }
     }
+    startY -= (height)/10
+
+    //note startY has been incremented to now be original startY plus height 
+    ctx.moveTo(endX, startY - height)
+    ctx.lineTo(endX, startY)
 
     ctx.stroke()
 
+    //draw clef images
     ctx.drawImage(images[0], canvas.width/(2.66 * scale), 3 * canvas.height/(12 * scale) - 0.3 *  height/10, 200, 5 * height/10)
     ctx.drawImage(images[1], canvas.width/(2.4 * scale), 3 * canvas.height/(12 * scale) + 6 * height/10, 100, 3 * height/10)
 
+
+    //draw key signature
+
+    sharpX = 0;
+    sharpY = 0;
+
+    //sharps
+    for(let i = 0; i < numSharps; i++){
+
+    }
+
+    flatX = 0;
+    flatY = 0;
+
+    //flats
+    for(let i = 0; i < numFlats; i++){
+        
+    }
 
 }
 
