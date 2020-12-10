@@ -44,6 +44,11 @@ var numSharps = 0;
 var numFlats = 0;
 var notes = [];
 
+var noteX = 0;
+var noteInputPath;
+var noteY = 0;
+var hoveredNote = false;
+
 drawKeyWheel()
 initKeyButtons()
 
@@ -113,6 +118,13 @@ canvas.addEventListener('mousemove', function(e) {
         
     }else{enharmonicButtonHovered = false}
 
+    if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
+
+        hoveredNote = true
+
+        noteY = e.offsetY
+
+    }else{hoveredNote = false}
 
 });
 
@@ -256,15 +268,15 @@ function calcKey(index, select){
                 sharps = 6;
                 flats = 0;
             }else if(showMinor && !showEnharmonics){
-                theKey = "D#m"
-
-                sharps = 6;
-                flats = 0;
-            }else{
                 theKey = "Ebm"
 
                 sharps = 0;
                 flats = 6;
+            }else{
+                theKey = "D#m"
+
+                sharps = 6;
+                flats = 0;
             }
             break;
         case 7:
@@ -279,15 +291,16 @@ function calcKey(index, select){
                 sharps = 7;
                 flats = 0;
             }else if(showMinor && !showEnharmonics){
-                theKey = "A#m"
-
-                sharps = 7;
-                flats = 0;
-            }else{
                 theKey = "Bbm"
 
                 sharps = 0;
                 flats = 5;
+                
+            }else{
+                theKey = "A#m"
+
+                sharps = 7;
+                flats = 0;
             }
             break;
         case 8:
@@ -622,6 +635,26 @@ function drawStaff(){
             flatY += height * .2
         }
     }   
+
+
+    //draw notes in chord
+    noteX = startX + width * .7
+
+    if(hoveredNote){
+        ctx.fillStyle = "red"
+        ctx.beginPath()
+        ctx.arc(noteX, noteY, 20, 0, 2 * Math.PI, false)
+        ctx.fill()
+    }
+
+    noteInputPath = new Path2D();
+
+    ctx.beginPath()
+    noteInputPath.rect(startX + width/2, startY - height/10, width * .4, height * 1.2)
+    ctx.closePath()
+
+    ctx.strokeStyle = "grey"
+    ctx.stroke(noteInputPath)
 
 }
 
