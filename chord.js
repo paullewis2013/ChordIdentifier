@@ -28,12 +28,24 @@ var paths = []
 var expanding = false;
 var hovered = null;
 
-var minor = false;
+//for the key wheel and buttons
+var showMinor = false;
+var showEnharmonics = false;
+var minorButtonPath;
+var enharmonicButtonPath;
+var minorButtonHovered;
+var enharmonicButtonHovered;
+var minorButtonX;
+var minorButtonY;
+var enharmonicButtonX;
+var enharmonicButtonY;
+
 var sharps = false;
 var flats = false;
 var notes = [];
 
 drawKeyWheel()
+initKeyButtons()
 
 function preloadImages(srcs, imgs) {
     
@@ -87,6 +99,19 @@ canvas.addEventListener('mousemove', function(e) {
         hovered = null;
     }
 
+    //check buttons
+    if(ctx.isPointInPath(minorButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        minorButtonHovered = true
+        
+    }else{minorButtonHovered = false}
+    if(ctx.isPointInPath(enharmonicButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        enharmonicButtonHovered = true
+        
+    }else{enharmonicButtonHovered = false}
+
+
 });
 
 canvas.addEventListener('mousedown', function(e) {
@@ -101,8 +126,25 @@ canvas.addEventListener('mousedown', function(e) {
         }
     }
 
-    drawKeyWheel()
-
+    //check buttons
+    if(ctx.isPointInPath(minorButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        if(showMinor){
+            showMinor = false;
+        }else{
+            showMinor = true;
+        }
+        
+    }
+    if(ctx.isPointInPath(enharmonicButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        if(showEnharmonics){
+            showEnharmonics = false;
+        }else{
+            showEnharmonics = true;
+        }
+        
+    }
 
 });
 
@@ -127,7 +169,16 @@ function calcKey(index, select){
             theKey = "E"
             break;
         case 5:
-            theKey = "B"
+            if(!showMinor && !showEnharmonics){
+                theKey = "B"
+            }else if(!showMinor && showEnharmonics){
+                theKey = "Cb"
+            }else if(showMinor && !showEnharmonics){
+                theKey = "G#m"
+            }else{
+                theKey = "Abm"
+            }
+            
             break;
         case 6:
             theKey = "Gb"
@@ -209,6 +260,7 @@ function drawKeyWheel(){
     initKeyWheel()
 
     ctx.strokeStyle = "black"
+    ctx.lineWidth = 1;
     
     //draw each sector draw selected keys sector in red
     for(let i = 0; i < paths.length; i++){
@@ -244,7 +296,112 @@ function drawKeyWheel(){
 
 }
 
+//define paths for two buttons one for toggling minor keys and one for toggling enharmonic names for keys
+function initKeyButtons(){
+
+    let x = keyX - 190
+    let y = keyY + 250
+    let w = 180
+    let h = 50
+    let radius = 10
+
+    minorButtonPath = new Path2D()
+
+    let r = x + w;
+    let b = y + h;
+    ctx.beginPath()
+    minorButtonPath.moveTo(x+radius, y);
+    minorButtonPath.lineTo(r-radius, y);
+    minorButtonPath.quadraticCurveTo(r, y, r, y+radius);
+    minorButtonPath.lineTo(r, y+h-radius);
+    minorButtonPath.quadraticCurveTo(r, b, r-radius, b);
+    minorButtonPath.lineTo(x+radius, b);
+    minorButtonPath.quadraticCurveTo(x, b, x, b-radius);
+    minorButtonPath.lineTo(x, y+radius);
+    minorButtonPath.quadraticCurveTo(x, y, x+radius, y);
+    ctx.closePath()
+
+    minorButtonX = x + w/2
+    minorButtonY = y + h/2
+
+    x += 200;
+
+    enharmonicButtonPath = new Path2D()
+
+    r = x + w;
+    b = y + h;
+    ctx.beginPath()
+    enharmonicButtonPath.moveTo(x+radius, y);
+    enharmonicButtonPath.lineTo(r-radius, y);
+    enharmonicButtonPath.quadraticCurveTo(r, y, r, y+radius);
+    enharmonicButtonPath.lineTo(r, y+h-radius);
+    enharmonicButtonPath.quadraticCurveTo(r, b, r-radius, b);
+    enharmonicButtonPath.lineTo(x+radius, b);
+    enharmonicButtonPath.quadraticCurveTo(x, b, x, b-radius);
+    enharmonicButtonPath.lineTo(x, y+radius);
+    enharmonicButtonPath.quadraticCurveTo(x, y, x+radius, y);
+    ctx.closePath()
+
+    enharmonicButtonX = x + w/2
+    enharmonicButtonY = y + h/2
+}
+
+function drawKeyButtons(){
+
+    let strokeColor = "red"
+    let hoveredFill = "#ffcccb"
+
+    //button shapes
+    ctx.fillStyle = "white"
+    if(minorButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    ctx.fill(minorButtonPath)
+
+    ctx.fillStyle = "white"
+    if(enharmonicButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    ctx.fill(enharmonicButtonPath)
+
+    ctx.fillStyle = "white"
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
+    ctx.stroke(minorButtonPath)
+
+    if(showMinor){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = strokeColor
+        ctx.stroke(minorButtonPath)
+    }
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
+    ctx.stroke(enharmonicButtonPath)
+
+    if(showEnharmonics){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = strokeColor
+        ctx.stroke(enharmonicButtonPath)
+    }
+
+    //button text
+    ctx.fillStyle = "black"
+    ctx.font = "25px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Minor", minorButtonX, minorButtonY + 10)
+
+    ctx.fillStyle = "black"
+    ctx.font = "25px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Enharmonic", enharmonicButtonX, enharmonicButtonY + 10)
+}
+
 function drawStaff(){
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
 
     ctx.beginPath()
     ctx.moveTo(canvas.width/(2.5 * scale), 3 * canvas.height/(12 * scale))
@@ -282,11 +439,12 @@ function drawCanvas(){
     ctx.fillText("Chord Identifier", 50, 50)
 
     drawKeyWheel()
+    drawKeyButtons()
 
     ctx.fillStyle = "black"
     ctx.font = "30px Arial"
-    ctx.textAlign = "left"
-    ctx.fillText("Key: " + key, 50, canvas.height/scale - 50)
+    ctx.textAlign = "center"
+    ctx.fillText("Key: " + key, keyX, keyY + 15)
 
     drawStaff()
 }
