@@ -154,19 +154,40 @@ function calcKey(index, select){
     switch(index){
 
         case 0:
-            theKey = "C"
+            if(!showMinor){
+                theKey = "C"
+            }else{
+                theKey = "Am"
+            }
+            
             break;
         case 1:
-            theKey = "G"
+            if(!showMinor){
+                theKey = "G"
+            }else{
+                theKey = "Em"
+            }
             break;
         case 2:
-            theKey = "D"
+            if(!showMinor){
+                theKey = "D"
+            }else{
+                theKey = "Bm"
+            }
             break;
         case 3:
-            theKey = "A"
+            if(!showMinor){
+                theKey = "A"
+            }else{
+                theKey = "F#m"
+            }
             break;
         case 4:
-            theKey = "E"
+            if(!showMinor){
+                theKey = "E"
+            }else{
+                theKey = "C#m"
+            }
             break;
         case 5:
             if(!showMinor && !showEnharmonics){
@@ -181,22 +202,54 @@ function calcKey(index, select){
             
             break;
         case 6:
-            theKey = "Gb"
+            if(!showMinor && !showEnharmonics){
+                theKey = "Gb"
+            }else if(!showMinor && showEnharmonics){
+                theKey = "F#"
+            }else if(showMinor && !showEnharmonics){
+                theKey = "D#m"
+            }else{
+                theKey = "Ebm"
+            }
             break;
         case 7:
-            theKey = "Db"
+            if(!showMinor && !showEnharmonics){
+                theKey = "Db"
+            }else if(!showMinor && showEnharmonics){
+                theKey = "C#"
+            }else if(showMinor && !showEnharmonics){
+                theKey = "A#m"
+            }else{
+                theKey = "Bbm"
+            }
             break;
         case 8:
-            theKey = "Ab"
+            if(!showMinor){
+                theKey = "Ab"
+            }else{
+                theKey = "Fm"
+            }
             break;
         case 9:
-            theKey = "Eb"
+            if(!showMinor){
+                theKey = "Eb"
+            }else{
+                theKey = "Cm"
+            }
             break;
         case 10:
-            theKey = "Bb"
+            if(!showMinor){
+                theKey = "Bb"
+            }else{
+                theKey = "Gm"
+            }
             break;
         case 11:
-            theKey = "F"
+            if(!showMinor){
+                theKey = "F"
+            }else{
+                theKey = "Dm"
+            }
             break;
         
         default:
