@@ -68,7 +68,10 @@ function preloadImages(srcs, imgs) {
 
 //any new image has to be added here and you need to append it otherwise it shifts all other indices
 var imageSrcs = ["assets/treble.svg", 
-                "assets/bass.svg"
+                "assets/bass.svg",
+                "assets/Flat.png",
+                "assets/Sharp.png",
+                "assets/Natural.png",
                 ];
 
 var images = [];
@@ -572,11 +575,12 @@ function drawStaff(){
             startY += (height)/10
         }
     }
-    startY -= (height)/10
+    //reset startY
+    startY -= 11 * (height)/10
 
-    //note startY has been incremented to now be original startY plus height 
-    ctx.moveTo(endX, startY - height)
-    ctx.lineTo(endX, startY)
+    //draw vertical line on rightside of staff
+    ctx.moveTo(endX, startY)
+    ctx.lineTo(endX, startY + height)
 
     ctx.stroke()
 
@@ -587,21 +591,37 @@ function drawStaff(){
 
     //draw key signature
 
-    sharpX = 0;
-    sharpY = 0;
+    sharpX = startX + width * .2;
+    sharpY = startY - height * .11;
 
     //sharps
     for(let i = 0; i < numSharps; i++){
+        ctx.drawImage(images[3], sharpX, sharpY, height * .07, height * .22)
+        ctx.drawImage(images[3], sharpX, sharpY + height * .7, height * .07, height * .22)
 
+        sharpX += height/20
+        if(i == 0 || i == 2 || i == 3 || i == 5){
+            sharpY += height * .15
+        }else if(i == 1 || i == 3 || i == 4){
+            sharpY -= height * .2
+        }
     }
 
-    flatX = 0;
-    flatY = 0;
+    flatX = startX + width * .2;
+    flatY = startY + height * .05;
 
     //flats
     for(let i = 0; i < numFlats; i++){
-        
-    }
+        ctx.drawImage(images[2], flatX, flatY, height * .07, height * .22)
+        ctx.drawImage(images[2], flatX, flatY + height * .7, height * .07, height * .22)
+
+        flatX += height/20
+        if(i % 2 == 0){
+            flatY -= height * .15
+        }else{
+            flatY += height * .2
+        }
+    }   
 
 }
 
