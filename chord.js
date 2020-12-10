@@ -3,22 +3,35 @@
 
 var canvas = document.getElementById("canvas")
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;  
+canvas.style.width = window.innerWidth + "px";
+canvas.style.height = window.innerHeight + "px";  
 
 var ctx = canvas.getContext('2d')
+
+// Set actual size in memory (scaled to account for extra pixel density).
+var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
+canvas.width = Math.floor(window.innerWidth * scale);
+canvas.height = Math.floor(window.innerHeight * scale);
+
+// Normalize coordinate system to use css pixels.
+ctx.scale(scale, scale);
 
 ctx.font = "30px Arial"
 ctx.fillText("Chord Identifier", 50, 50)
 
-var keyX = canvas.width/6
-var keyY = canvas.height/2
+var keyX = canvas.width/(6 * scale)
+var keyY = canvas.height/(2 * scale)
 var keyIndex = 0
 var key = "C"
 
-let paths = []
+var paths = []
 var expanding = false;
 var hovered = null;
+
+var minor = false;
+var sharps = false;
+var flats = false;
+var notes = [];
 
 drawKeyWheel()
 
@@ -33,7 +46,7 @@ function preloadImages(srcs, imgs) {
         img.onload = function() {
             --remaining;
             if (remaining <= 0) {
-                setInterval(drawFrame, 80)
+                setInterval(drawFrame, 50)
             }
         };
         img.src = srcs[i];
@@ -58,7 +71,7 @@ canvas.addEventListener('mousemove', function(e) {
     //loop through all sectors of key wheel
     for(let i = 0; i < paths.length; i++){
 
-        if(ctx.isPointInPath(paths[i], e.offsetX, e.offsetY)){
+        if(ctx.isPointInPath(paths[i], e.offsetX * scale, e.offsetY * scale)){
             console.log(i)
             found = true;
 
@@ -81,7 +94,7 @@ canvas.addEventListener('mousedown', function(e) {
 
     //loop through all sectors of key wheel
     for(let i = 0; i < paths.length; i++){
-        if(ctx.isPointInPath(paths[i], e.offsetX, e.offsetY)){
+        if(ctx.isPointInPath(paths[i], e.offsetX * scale, e.offsetY * scale)){
             keyIndex = i;
             calcKey(keyIndex, true)
             console.log(key)
@@ -234,15 +247,15 @@ function drawKeyWheel(){
 function drawStaff(){
 
     ctx.beginPath()
-    ctx.moveTo(canvas.width/2.5, 3 * canvas.height/12)
-    ctx.lineTo(canvas.width/2.5, canvas.height - 1.5 * canvas.height/6)
+    ctx.moveTo(canvas.width/(2.5 * scale), 3 * canvas.height/(12 * scale))
+    ctx.lineTo(canvas.width/(2.5 * scale), canvas.height/scale - 1.5 * canvas.height/(6 * scale))
 
-    let startY =  3 * canvas.height/12
-    let height = (canvas.height - 1.5 * canvas.height/6) - 3 * canvas.height/12
+    let startY =  3 * canvas.height/(12 * scale)
+    let height = (canvas.height/scale - 1.5 * canvas.height/(6 * scale)) - 3 * canvas.height/(12 * scale)
 
     for(let i = 0; i < 10; i++){
-        ctx.moveTo(canvas.width/2.5, startY)
-        ctx.lineTo(canvas.width - canvas.width/8, startY)
+        ctx.moveTo(canvas.width/(2.5 * scale), startY)
+        ctx.lineTo(canvas.width/scale - canvas.width/(8 * scale), startY)
 
         startY += (height)/10
         if(i == 4){
@@ -252,8 +265,8 @@ function drawStaff(){
 
     ctx.stroke()
 
-    ctx.drawImage(images[0], canvas.width/2.66, 3 * canvas.height/12 - 0.3 *  height/10, 200, 5 * height/10)
-    ctx.drawImage(images[1], canvas.width/2.4, 3 * canvas.height/12 + 6 * height/10, 100, 3 * height/10)
+    ctx.drawImage(images[0], canvas.width/(2.66 * scale), 3 * canvas.height/(12 * scale) - 0.3 *  height/10, 200, 5 * height/10)
+    ctx.drawImage(images[1], canvas.width/(2.4 * scale), 3 * canvas.height/(12 * scale) + 6 * height/10, 100, 3 * height/10)
 
 
 }
@@ -261,7 +274,7 @@ function drawStaff(){
 function drawCanvas(){
     ctx.fillStyle = "#F9F1F1"
     ctx.textAlign = "left"
-    ctx.rect(0,0,canvas.width, canvas.height)
+    ctx.rect(0,0,canvas.width/scale, canvas.height/scale)
     ctx.fill()
 
     ctx.fillStyle = "black"
@@ -273,7 +286,7 @@ function drawCanvas(){
     ctx.fillStyle = "black"
     ctx.font = "30px Arial"
     ctx.textAlign = "left"
-    ctx.fillText("Key: " + key, 50, canvas.height - 50)
+    ctx.fillText("Key: " + key, 50, canvas.height/scale - 50)
 
     drawStaff()
 }
