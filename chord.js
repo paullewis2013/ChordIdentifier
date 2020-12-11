@@ -39,6 +39,10 @@ var minorButtonX;
 var minorButtonY;
 var enharmonicButtonX;
 var enharmonicButtonY;
+var clearButtonPath;
+var clearButtonHovered;
+var clearButtonX;
+var clearButtonY;
 
 var numSharps = 0;
 var numFlats = 0;
@@ -46,13 +50,15 @@ var notes = [];
 
 var noteX = 0;
 var noteInputPath;
-var noteY = 0;
+var noteY = -1000;
 var hoveredNote = false;
 var noteSnapped = false;
 var hoveredNoteName = "";
 
+
+
 drawKeyWheel()
-initKeyButtons()
+initButtons()
 
 function preloadImages(srcs, imgs) {
     
@@ -119,6 +125,11 @@ canvas.addEventListener('mousemove', function(e) {
         enharmonicButtonHovered = true
         
     }else{enharmonicButtonHovered = false}
+    if(ctx.isPointInPath(clearButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        clearButtonHovered = true
+        
+    }else{clearButtonHovered = false}
 
     if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
 
@@ -166,10 +177,18 @@ canvas.addEventListener('mousedown', function(e) {
         calcKey(keyIndex, true)
         
     }
+    if(ctx.isPointInPath(clearButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        notes = []
+        
+    }
 
-    if(hoveredNote && noteSnapped){
+
+    if(hoveredNote){
 
         let dup = false
+        let height = (canvas.height/scale - 1.5 * canvas.height/(6 * scale)) - 3 * canvas.height/(12 * scale)
+        noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
         //make sure note isn't a duplicate
         for(let i = 0; i < notes.length; i++){
@@ -433,8 +452,7 @@ function drawKeyWheel(){
     initKeyWheel()
 
     ctx.strokeStyle = "black"
-    ctx.lineWidth = 1;
-    
+    ctx.lineWidth = 0.2
     //draw each sector draw selected keys sector in red
     for(let i = 0; i < paths.length; i++){
         ctx.fillStyle = "white"
@@ -445,7 +463,7 @@ function drawKeyWheel(){
             ctx.fillStyle = "#ffcccb"
         }
 
-
+        ctx.stroke(paths[i])
         ctx.fill(paths[i])
     }
 
@@ -470,7 +488,7 @@ function drawKeyWheel(){
 }
 
 //define paths for two buttons one for toggling minor keys and one for toggling enharmonic names for keys
-function initKeyButtons(){
+function initButtons(){
 
     let x = keyX - 190
     let y = keyY + 250
@@ -517,9 +535,31 @@ function initKeyButtons(){
 
     enharmonicButtonX = x + w/2
     enharmonicButtonY = y + h/2
+
+    //clear button
+    clearButtonPath = new Path2D()
+
+    x = (canvas.width/(2.5 * scale))// + (canvas.width/scale - canvas.width/(8 * scale)))/2
+
+    r = x + w;
+    b = y + h;
+    ctx.beginPath()
+    clearButtonPath.moveTo(x+radius, y);
+    clearButtonPath.lineTo(r-radius, y);
+    clearButtonPath.quadraticCurveTo(r, y, r, y+radius);
+    clearButtonPath.lineTo(r, y+h-radius);
+    clearButtonPath.quadraticCurveTo(r, b, r-radius, b);
+    clearButtonPath.lineTo(x+radius, b);
+    clearButtonPath.quadraticCurveTo(x, b, x, b-radius);
+    clearButtonPath.lineTo(x, y+radius);
+    clearButtonPath.quadraticCurveTo(x, y, x+radius, y);
+    ctx.closePath()
+
+    clearButtonX = x + w/2
+    clearButtonY = y + h/2
 }
 
-function drawKeyButtons(){
+function drawButtons(){
 
     let strokeColor = "red"
     let hoveredFill = "#ffcccb"
@@ -538,7 +578,15 @@ function drawKeyButtons(){
     ctx.fill(enharmonicButtonPath)
 
     ctx.fillStyle = "white"
+    if(clearButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    ctx.fill(clearButtonPath)
 
+    ctx.fillStyle = "white"
+
+
+    //button strokes
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
     ctx.stroke(minorButtonPath)
@@ -559,6 +607,10 @@ function drawKeyButtons(){
         ctx.stroke(enharmonicButtonPath)
     }
 
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
+    ctx.stroke(clearButtonPath)
+
     //button text
     ctx.fillStyle = "black"
     ctx.font = "25px Arial"
@@ -568,7 +620,12 @@ function drawKeyButtons(){
     ctx.fillStyle = "black"
     ctx.font = "25px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Enharmonic", enharmonicButtonX, enharmonicButtonY + 10)
+    ctx.fillText("Enharmonics", enharmonicButtonX, enharmonicButtonY + 10)
+    
+    ctx.fillStyle = "black"
+    ctx.font = "25px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Clear Notes", clearButtonX, clearButtonY + 10)
 }
 
 function drawStaff(){
@@ -750,10 +807,7 @@ function drawStaff(){
         
         
 
-        ctx.fillStyle = "#ffcccb"
-        ctx.beginPath()
-        ctx.arc(noteX, noteY, 20, 0, 2 * Math.PI, false)
-        ctx.fill()
+        
     }
 
     noteInputPath = new Path2D();
@@ -773,6 +827,14 @@ function drawStaff(){
         ctx.fill()
     }
 
+    if(hoveredNote){
+        ctx.fillStyle = "#ffcccb"
+        ctx.beginPath()
+        ctx.arc(noteX, noteY, 20, 0, 2 * Math.PI, false)
+        ctx.fill()
+    }
+    
+
 }
 
 function drawCanvas(){
@@ -786,7 +848,7 @@ function drawCanvas(){
     ctx.fillText("Chord Identifier", 50, 50)
 
     drawKeyWheel()
-    drawKeyButtons()
+    drawButtons()
 
     ctx.fillStyle = "black"
     ctx.font = "30px Arial"
