@@ -82,6 +82,7 @@ var imageSrcs = ["assets/treble.svg",
                 "assets/Flat.png",
                 "assets/Sharp.png",
                 "assets/Natural.png",
+                "assets/Stemless notehead filled in.png"
                 ];
 
 var images = [];
@@ -860,10 +861,12 @@ function drawStaff(){
         }
 
 
-        ctx.fillStyle = "black"
-        ctx.beginPath()
-        ctx.arc(noteX, notes[i].noteY, height * 0.05, 0, 2 * Math.PI, false)
-        ctx.fill()
+        // ctx.fillStyle = "black"
+        // ctx.beginPath()
+        // ctx.arc(noteX, notes[i].noteY, height * 0.05, 0, 2 * Math.PI, false)
+        // ctx.fill()
+        let notewidth = height * .15
+        ctx.drawImage(images[5], noteX - notewidth/2, notes[i].noteY - height * .05, notewidth, height * .1)
     }
 
     if(hoveredNote){
@@ -907,10 +910,12 @@ function drawStaff(){
             ctx.stroke()
         }
 
-        ctx.fillStyle = "#ffcccb"
-        ctx.beginPath()
-        ctx.arc(noteX, noteY, height * 0.05, 0, 2 * Math.PI, false)
-        ctx.fill()
+        // ctx.fillStyle = "#ffcccb"
+        //ctx.beginPath()
+        //ctx.arc(noteX, noteY, height * 0.05, 0, 2 * Math.PI, false)
+        let notewidth = height * .15
+        ctx.drawImage(images[5], noteX - notewidth/2, noteY - height * .05, notewidth, height * .1)
+        //ctx.fill()
     }
     
 
