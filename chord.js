@@ -48,6 +48,8 @@ var noteX = 0;
 var noteInputPath;
 var noteY = 0;
 var hoveredNote = false;
+var noteSnapped = false;
+var hoveredNoteName = "";
 
 drawKeyWheel()
 initKeyButtons()
@@ -121,6 +123,7 @@ canvas.addEventListener('mousemove', function(e) {
     if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
 
         hoveredNote = true
+        noteSnapped = false
 
         noteY = e.offsetY
 
@@ -162,6 +165,23 @@ canvas.addEventListener('mousedown', function(e) {
 
         calcKey(keyIndex, true)
         
+    }
+
+    if(hoveredNote && noteSnapped){
+
+        let dup = false
+
+        //make sure note isn't a duplicate
+        for(let i = 0; i < notes.length; i++){
+            if(Math.abs((notes[i].noteY) - noteY) < 1){
+                dup = true
+            }
+        }
+        if(!dup){
+            notes.push({hoveredNoteName, noteY})
+        }
+        
+        console.log(notes)
     }
 
 });
@@ -641,7 +661,96 @@ function drawStaff(){
     noteX = startX + width * .7
 
     if(hoveredNote){
-        ctx.fillStyle = "red"
+
+        let noteName = "";
+
+        if(!noteSnapped){
+            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+            noteSnapped = true;
+
+            let notePosition = Math.floor((startY + height * 1.2)/(height * 0.05) - noteY/(height * 0.05))
+            notePosition = notePosition % 7
+            notePosition -= 3
+            if(notePosition <= 0){notePosition += 7}
+            notePosition += 64
+            // console.log(String.fromCharCode(notePosition))
+
+            noteName = String.fromCharCode(notePosition)
+            // console.log(notePosition)
+            switch(noteName){
+
+                case "F":
+                    if(numSharps >= 1){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 7){
+                        noteName += "b"
+                    }
+                    break;
+                
+                case "C":
+                    if(numSharps >= 2){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 6){
+                        noteName += "b"
+                    }
+                    break;
+    
+                case "G":
+                    if(numSharps >= 3){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 5){
+                        noteName += "b"
+                    }
+                    break;
+    
+                case "D":
+                    if(numSharps >= 4){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 4){
+                        noteName += "b"
+                    }
+                    break;
+    
+                case "A":
+                    if(numSharps >= 5){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 3){
+                        noteName += "b"
+                    }
+                    break;
+    
+                case "E":
+                    if(numSharps >= 6){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 2){
+                        noteName += "b"
+                    }
+                    break;
+    
+                case "B":
+                    if(numSharps >= 7){
+                        noteName += "#"
+                    }
+                    if(numFlats >= 1){
+                        noteName += "b"
+                    }
+                    break;
+            }
+    
+            console.log(noteName)
+
+            hoveredNoteName = noteName
+        }
+        
+        
+
+        ctx.fillStyle = "#ffcccb"
         ctx.beginPath()
         ctx.arc(noteX, noteY, 20, 0, 2 * Math.PI, false)
         ctx.fill()
@@ -650,11 +759,19 @@ function drawStaff(){
     noteInputPath = new Path2D();
 
     ctx.beginPath()
-    noteInputPath.rect(startX + width/2, startY - height/10, width * .4, height * 1.2)
+    noteInputPath.rect(startX + width/2, startY - height * .2, width * .4, height * 1.4)
     ctx.closePath()
 
     ctx.strokeStyle = "grey"
     ctx.stroke(noteInputPath)
+
+    //draw notes
+    for(let i = 0; i < notes.length; i++){
+        ctx.fillStyle = "black"
+        ctx.beginPath()
+        ctx.arc(noteX, notes[i].noteY, 20, 0, 2 * Math.PI, false)
+        ctx.fill()
+    }
 
 }
 
