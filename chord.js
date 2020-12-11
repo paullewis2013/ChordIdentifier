@@ -52,10 +52,13 @@ var hoveredNote = false;
 var noteSnapped = false;
 var hoveredNoteName = "";
 
-
+var noteDisplayPath;
+var noteDisplayX;
+var noteDisplayY;
 
 drawKeyWheel()
 initButtons()
+initNotesDisplay()
 
 function preloadImages(srcs, imgs) {
     
@@ -628,6 +631,64 @@ function drawButtons(){
     ctx.fillText("Clear Notes", clearButtonX, clearButtonY + 10)
 }
 
+function initNotesDisplay(){
+
+    let x = canvas.width/(2.5 * scale)
+    let y = 20
+    let w = 300
+    let h = 100
+    let radius = 10
+
+    noteDisplayPath = new Path2D()
+
+    let r = x + w;
+    let b = y + h;
+    ctx.beginPath()
+    noteDisplayPath.moveTo(x+radius, y);
+    noteDisplayPath.lineTo(r-radius, y);
+    noteDisplayPath.quadraticCurveTo(r, y, r, y+radius);
+    noteDisplayPath.lineTo(r, y+h-radius);
+    noteDisplayPath.quadraticCurveTo(r, b, r-radius, b);
+    noteDisplayPath.lineTo(x+radius, b);
+    noteDisplayPath.quadraticCurveTo(x, b, x, b-radius);
+    noteDisplayPath.lineTo(x, y+radius);
+    noteDisplayPath.quadraticCurveTo(x, y, x+radius, y);
+    ctx.closePath()
+
+    noteDisplayX = x
+    noteDisplayY = y
+}
+
+function drawNotesDisplay(){
+
+    ctx.fillStyle = "white"
+    ctx.fill(noteDisplayPath)
+
+    ctx.strokeStyle = "black"
+    ctx.lineWidth = 1
+    ctx.stroke(noteDisplayPath)
+
+    ctx.fillStyle = "black"
+    ctx.font = "20px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Notes:", noteDisplayX + 150, noteDisplayY + 30)
+
+    let notesAsString = "{"
+
+    for(let i = 0; i < notes.length; i++){
+        notesAsString += " " + notes[i].hoveredNoteName 
+        if(i != notes.length){
+            notesAsString += ","
+        }
+    }
+
+    notesAsString += "}"
+
+    ctx.textAlign = "left"
+    ctx.fillText(notesAsString, noteDisplayX + 5, noteDisplayY + 70)
+
+}
+
 function drawStaff(){
 
     //define borders
@@ -930,9 +991,21 @@ function drawCanvas(){
     ctx.fillStyle = "black"
     ctx.font = "45px Arial"
     ctx.fillText("Chord Identifier", 30, 60)
+    
+    let startX = canvas.width/(2.5 * scale)
+    let endX = canvas.width/scale - canvas.width/(50 * scale)
+    let width = endX - startX
+
+    ctx.fillStyle = "grey"
+    ctx.font = "15px Arial"
+    ctx.fillText("By Paul", 30, 80)
+    ctx.fillText("Select key using", 20, 150)
+    ctx.fillText("wheel:", 20, 170)
+    ctx.fillText("Hover over box to insert chord notes below:", startX + width/2, 30)
 
     drawKeyWheel()
     drawButtons()
+    drawNotesDisplay()
 
     ctx.fillStyle = "black"
     ctx.font = "30px Arial"
