@@ -152,6 +152,10 @@ canvas.addEventListener('mousedown', function(e) {
             keyIndex = i;
             calcKey(keyIndex, true)
             // console.log(key)
+
+            for(let i = 0; i < notes.length; i++){
+                notes[i].hoveredNoteName = determineNoteName(notes[i].hoveredNoteName)
+            }
         }
     }
 
@@ -176,6 +180,10 @@ canvas.addEventListener('mousedown', function(e) {
         }
 
         calcKey(keyIndex, true)
+
+        for(let i = 0; i < notes.length; i++){
+            notes[i].hoveredNoteName = determineNoteName(notes[i].hoveredNoteName)
+        }
         
     }
     if(ctx.isPointInPath(clearButtonPath, e.offsetX * scale, e.offsetY * scale)){
@@ -677,8 +685,10 @@ function drawNotesDisplay(){
 
     for(let i = 0; i < notes.length; i++){
         notesAsString += " " + notes[i].hoveredNoteName 
-        if(i != notes.length){
+        if(i != notes.length - 1){
             notesAsString += ","
+        }else{
+            notesAsString += " "
         }
     }
 
@@ -687,6 +697,81 @@ function drawNotesDisplay(){
     ctx.textAlign = "left"
     ctx.fillText(notesAsString, noteDisplayX + 5, noteDisplayY + 70)
 
+}
+
+function determineNoteName(noteName){
+
+    //cut off anything other than the letter
+    noteName = noteName.substring(0,1)
+
+    //apply sharps or flats based on key
+    switch(noteName){
+
+        case "F":
+            if(numSharps >= 1){
+                noteName += "#"
+            }
+            if(numFlats >= 7){
+                noteName += "b"
+            }
+            break;
+        
+        case "C":
+            if(numSharps >= 2){
+                noteName += "#"
+            }
+            if(numFlats >= 6){
+                noteName += "b"
+            }
+            break;
+
+        case "G":
+            if(numSharps >= 3){
+                noteName += "#"
+            }
+            if(numFlats >= 5){
+                noteName += "b"
+            }
+            break;
+
+        case "D":
+            if(numSharps >= 4){
+                noteName += "#"
+            }
+            if(numFlats >= 4){
+                noteName += "b"
+            }
+            break;
+
+        case "A":
+            if(numSharps >= 5){
+                noteName += "#"
+            }
+            if(numFlats >= 3){
+                noteName += "b"
+            }
+            break;
+
+        case "E":
+            if(numSharps >= 6){
+                noteName += "#"
+            }
+            if(numFlats >= 2){
+                noteName += "b"
+            }
+            break;
+
+        case "B":
+            if(numSharps >= 7){
+                noteName += "#"
+            }
+            if(numFlats >= 1){
+                noteName += "b"
+            }
+            break;
+    }
+
+    return noteName
 }
 
 function drawStaff(){
@@ -794,71 +879,8 @@ function drawStaff(){
 
             noteName = String.fromCharCode(notePosition)
             // console.log(notePosition)
-            switch(noteName){
 
-                case "F":
-                    if(numSharps >= 1){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 7){
-                        noteName += "b"
-                    }
-                    break;
-                
-                case "C":
-                    if(numSharps >= 2){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 6){
-                        noteName += "b"
-                    }
-                    break;
-    
-                case "G":
-                    if(numSharps >= 3){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 5){
-                        noteName += "b"
-                    }
-                    break;
-    
-                case "D":
-                    if(numSharps >= 4){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 4){
-                        noteName += "b"
-                    }
-                    break;
-    
-                case "A":
-                    if(numSharps >= 5){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 3){
-                        noteName += "b"
-                    }
-                    break;
-    
-                case "E":
-                    if(numSharps >= 6){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 2){
-                        noteName += "b"
-                    }
-                    break;
-    
-                case "B":
-                    if(numSharps >= 7){
-                        noteName += "#"
-                    }
-                    if(numFlats >= 1){
-                        noteName += "b"
-                    }
-                    break;
-            }
+            noteName = determineNoteName(noteName)
     
             console.log(noteName)
 
