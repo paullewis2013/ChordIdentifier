@@ -16,11 +16,8 @@ canvas.height = Math.floor(window.innerHeight * scale);
 // Normalize coordinate system to use css pixels.
 ctx.scale(scale, scale);
 
-ctx.font = "30px Arial"
-ctx.fillText("Chord Identifier", 50, 50)
-
 var keyX = canvas.width/(6 * scale)
-var keyY = canvas.height/(2 * scale)
+var keyY = (canvas.height/(scale)) * .45
 var keyIndex = 0
 var key = "C"
 
@@ -50,7 +47,7 @@ var notes = [];
 
 var noteX = 0;
 var noteInputPath;
-var noteY = -1000;
+var noteY;
 var hoveredNote = false;
 var noteSnapped = false;
 var hoveredNoteName = "";
@@ -187,7 +184,8 @@ canvas.addEventListener('mousedown', function(e) {
     if(hoveredNote){
 
         let dup = false
-        let height = (canvas.height/scale - 1.5 * canvas.height/(6 * scale)) - 3 * canvas.height/(12 * scale)
+
+        let height = canvas.height/(2 * scale)
         noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
         //make sure note isn't a duplicate
@@ -196,6 +194,7 @@ canvas.addEventListener('mousedown', function(e) {
                 dup = true
             }
         }
+
         if(!dup){
             notes.push({hoveredNoteName, noteY})
         }
@@ -491,7 +490,7 @@ function drawKeyWheel(){
 function initButtons(){
 
     let x = keyX - 190
-    let y = keyY + 250
+    let y = keyY + 230
     let w = 180
     let h = 50
     let radius = 10
@@ -632,9 +631,9 @@ function drawStaff(){
 
     //define borders
     let startX = canvas.width/(2.5 * scale)
-    let endX = canvas.width/scale - canvas.width/(8 * scale)
-    let startY =  3 * canvas.height/(12 * scale)
-    let height = (canvas.height/scale - 1.5 * canvas.height/(6 * scale)) - 3 * canvas.height/(12 * scale)
+    let endX = canvas.width/scale - canvas.width/(50 * scale)
+    let height = canvas.height/(2 * scale)
+    let startY =  keyY - height/2
     let width = endX - startX;
 
     //make two white boxes behind staff
@@ -652,8 +651,8 @@ function drawStaff(){
 
     //draw left side vertical line
     ctx.beginPath()
-    ctx.moveTo(startX, 3 * canvas.height/(12 * scale))
-    ctx.lineTo(startX, canvas.height/scale - 1.5 * canvas.height/(6 * scale))
+    ctx.moveTo(startX, startY)
+    ctx.lineTo(startX, startY + height)
 
     //draw horizontal lines in staff
     for(let i = 0; i < 10; i++){
@@ -675,12 +674,11 @@ function drawStaff(){
     ctx.stroke()
 
     //draw clef images
-    ctx.drawImage(images[0], canvas.width/(2.66 * scale), 3 * canvas.height/(12 * scale) - 0.3 *  height/10, 200, 5 * height/10)
-    ctx.drawImage(images[1], canvas.width/(2.4 * scale), 3 * canvas.height/(12 * scale) + 6 * height/10, 100, 3 * height/10)
+    ctx.drawImage(images[0], canvas.width/(2.66 * scale), startY - 0.3 *  height/10, 200, 5 * height/10)
+    ctx.drawImage(images[1], canvas.width/(2.4 * scale), startY + 6 * height/10, 100, 3 * height/10)
 
 
     //draw key signature
-
     sharpX = startX + width * .2;
     sharpY = startY - height * .11;
 
@@ -813,7 +811,7 @@ function drawStaff(){
     noteInputPath = new Path2D();
 
     ctx.beginPath()
-    noteInputPath.rect(startX + width/2, startY - height * .2, width * .4, height * 1.4)
+    noteInputPath.rect(startX + width/2, startY - height * .3, width * .4, height * 1.5)
     ctx.closePath()
 
     ctx.strokeStyle = "grey"
@@ -821,16 +819,97 @@ function drawStaff(){
 
     //draw notes
     for(let i = 0; i < notes.length; i++){
+
+        //ledger lines if necesary
+        if(Math.abs(notes[i].noteY - (startY + height/2)) < 1){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, notes[i].noteY)
+            ctx.lineTo(noteX + 50, notes[i].noteY)
+            ctx.stroke()
+            
+        }
+        if(notes[i].noteY <= startY - height * .09){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, startY - height * .1)
+            ctx.lineTo(noteX + 50, startY - height * .1)
+            ctx.stroke()
+        }
+        if(notes[i].noteY <= startY - height * .19){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, startY - height * .2)
+            ctx.lineTo(noteX + 50, startY - height * .2)
+            ctx.stroke()
+        }
+        if(notes[i].noteY >= startY + height * 1.09){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, startY + height * 1.1)
+            ctx.lineTo(noteX + 50, startY + height * 1.1)
+            ctx.stroke()
+        }
+
+
         ctx.fillStyle = "black"
         ctx.beginPath()
-        ctx.arc(noteX, notes[i].noteY, 20, 0, 2 * Math.PI, false)
+        ctx.arc(noteX, notes[i].noteY, height * 0.05, 0, 2 * Math.PI, false)
         ctx.fill()
     }
 
     if(hoveredNote){
+
+        //ledger lines if necesary
+        if(Math.abs(noteY - (startY + height/2)) < 1){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, noteY)
+            ctx.lineTo(noteX + 50, noteY)
+            ctx.stroke()
+            
+        }
+        if(noteY <= startY - height * .09){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, startY - height * .1)
+            ctx.lineTo(noteX + 50, startY - height * .1)
+            ctx.stroke()
+        }
+        if(noteY <= startY - height * .19){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, startY - height * .2)
+            ctx.lineTo(noteX + 50, startY - height * .2)
+            ctx.stroke()
+        }
+        if(noteY >= startY + height * 1.09){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - 50, startY + height * 1.1)
+            ctx.lineTo(noteX + 50, startY + height * 1.1)
+            ctx.stroke()
+        }
+
         ctx.fillStyle = "#ffcccb"
         ctx.beginPath()
-        ctx.arc(noteX, noteY, 20, 0, 2 * Math.PI, false)
+        ctx.arc(noteX, noteY, height * 0.05, 0, 2 * Math.PI, false)
         ctx.fill()
     }
     
@@ -844,8 +923,8 @@ function drawCanvas(){
     ctx.fill()
 
     ctx.fillStyle = "black"
-    ctx.font = "30px Arial"
-    ctx.fillText("Chord Identifier", 50, 50)
+    ctx.font = "45px Arial"
+    ctx.fillText("Chord Identifier", 30, 60)
 
     drawKeyWheel()
     drawButtons()
