@@ -207,8 +207,11 @@ canvas.addEventListener('mousedown', function(e) {
             }
         }
 
-        if(!dup){
+        if(!dup && notes.length < 7){
             notes.push({hoveredNoteName, noteY})
+
+            //every time a note is added resort the notes to be in acsending order
+            notes.sort((a, b) => (a.noteY < b.noteY) ? 1 : -1)
         }
         
         console.log(notes)
@@ -498,7 +501,7 @@ function drawKeyWheel(){
 
 }
 
-//define paths for two buttons one for toggling minor keys and one for toggling enharmonic names for keys
+//define paths for buttons 
 function initButtons(){
 
     let x = keyX - 190
@@ -641,10 +644,13 @@ function drawButtons(){
 
 function initNotesDisplay(){
 
+    let height = canvas.height/(2 * scale)
+    let startY =  keyY - height/2
+
     let x = canvas.width/(2.5 * scale)
-    let y = 20
+    let y = startY - height * .3
     let w = 300
-    let h = 100
+    let h = 60
     let radius = 10
 
     noteDisplayPath = new Path2D()
@@ -679,7 +685,7 @@ function drawNotesDisplay(){
     ctx.fillStyle = "black"
     ctx.font = "20px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Notes:", noteDisplayX + 150, noteDisplayY + 30)
+    ctx.fillText("Notes:", noteDisplayX + 150, noteDisplayY + 20)
 
     let notesAsString = "{"
 
@@ -695,7 +701,7 @@ function drawNotesDisplay(){
     notesAsString += "}"
 
     ctx.textAlign = "left"
-    ctx.fillText(notesAsString, noteDisplayX + 5, noteDisplayY + 70)
+    ctx.fillText(notesAsString, noteDisplayX + 5, noteDisplayY + 50)
 
 }
 
@@ -1001,6 +1007,33 @@ function drawStaff(){
         //ctx.fill()
     }
     
+
+}
+
+function calcChordNames(){
+
+    let chordNames = []
+    let root = ""
+    let rootNum = 0
+    let notesTonal = []
+
+    //convert all notes to 0-11 tonal representation
+    //TODO for loop here
+
+    //loop through all notes and consider each as root notes
+    //note this will fail to recognize rootless chords
+    for(let i = 0; i < notes.length; i++){
+
+        root = notes[i].hoveredNoteName;
+
+        rootNum = notesTonal[i]
+
+
+        //add the new name to the array to return
+        chordNames.push(root)
+    }
+
+    return chordNames
 
 }
 
