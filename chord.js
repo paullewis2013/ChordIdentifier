@@ -56,6 +56,8 @@ var noteDisplayPath;
 var noteDisplayX;
 var noteDisplayY;
 
+var chordNames;
+
 drawKeyWheel()
 initButtons()
 initNotesDisplay()
@@ -156,6 +158,8 @@ canvas.addEventListener('mousedown', function(e) {
             for(let i = 0; i < notes.length; i++){
                 notes[i].hoveredNoteName = determineNoteName(notes[i].hoveredNoteName)
             }
+
+            chordNames = calcChordNames()
         }
     }
 
@@ -184,11 +188,14 @@ canvas.addEventListener('mousedown', function(e) {
         for(let i = 0; i < notes.length; i++){
             notes[i].hoveredNoteName = determineNoteName(notes[i].hoveredNoteName)
         }
+
+        chordNames = calcChordNames()
         
     }
     if(ctx.isPointInPath(clearButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         notes = []
+        chordNames = []
         
     }
 
@@ -212,6 +219,8 @@ canvas.addEventListener('mousedown', function(e) {
 
             //every time a note is added resort the notes to be in acsending order
             notes.sort((a, b) => (a.noteY < b.noteY) ? 1 : -1)
+
+            chordNames = calcChordNames()
         }
         
         console.log(notes)
@@ -888,7 +897,7 @@ function drawStaff(){
 
             noteName = determineNoteName(noteName)
     
-            console.log(noteName)
+            // console.log(noteName)
 
             hoveredNoteName = noteName
         }
@@ -1010,6 +1019,75 @@ function drawStaff(){
 
 }
 
+//convert string to int where 0 = A up to 11 = G#
+function noteToNum(note){
+
+    let num = 0;
+
+    switch(note){
+        case "A":
+            num = 0;
+            break;
+
+        case "A#":
+        case "Bb":
+            num = 1;
+            break;
+
+        case "B":
+        case "Cb":
+            num = 2;
+            break;
+
+        case "B#":
+        case "C":
+            num = 3;
+            break;
+        
+        case "C#":
+        case "Db":
+            num = 4
+            break;
+
+        case "D":
+            num = 5
+            break;
+
+        case "D#":
+        case "Eb":
+            num = 6
+            break;
+
+        case "E":
+        case "Fb":
+            num = 7
+            break;
+
+        case "E#":
+        case "F":
+            num = 8
+            break;
+        
+        case "F#":
+        case "Gb":
+            num = 9
+            break;
+
+        case "G":
+            num = 10
+            break;
+
+        case "G#":
+        case "Ab":
+            num = 11
+            break;
+
+
+    }
+    return num
+
+}
+
 function calcChordNames(){
 
     let chordNames = []
@@ -1017,23 +1095,133 @@ function calcChordNames(){
     let rootNum = 0
     let notesTonal = []
 
-    //convert all notes to 0-11 tonal representation
-    //TODO for loop here
+    // console.log(notes)
+
+    //first convert all notes to 0-11 tonal representation
+    for(let i = 0; i < notes.length; i++){
+
+        //get note as string
+        let note = notes[i].hoveredNoteName;
+        let num = noteToNum(note)
+
+        //add note to notesTonal if it is not already contained in notesTonal
+        if(!notesTonal.includes(num)){
+            notesTonal.push(num)
+        }
+
+    }
+
+    // console.log(notesTonal)
 
     //loop through all notes and consider each as root notes
     //note this will fail to recognize rootless chords
     for(let i = 0; i < notes.length; i++){
 
+        //store letter name of note as string for later
         root = notes[i].hoveredNoteName;
 
-        rootNum = notesTonal[i]
+        //get tone number of note
+        rootNum = noteToNum(root)
 
+        //transpose other notes relative to current root
+        let currNotesTonal = notesTonal.slice()
+        for(let i = 0; i < currNotesTonal.length; i++){
+            currNotesTonal[i] -= rootNum
+            if(currNotesTonal[i] < 0){
+                currNotesTonal[i] += 12
+            }
+        }
+
+        //sort the new array
+        // currNotesTonal.sort((a,b) => a - b)
+
+        let chordType = determineChordType(root, currNotesTonal)
 
         //add the new name to the array to return
-        chordNames.push(root)
+        if(chordType != "Unrecognized" && !chordNames.includes(chordType)){
+            chordNames.push(chordType)
+        }
+        
     }
 
     return chordNames
+
+}
+
+//passed an array of (unique) number values (in ascending order) representing the distance from the root in semi tones
+function determineChordType(root, currNotesTonal){
+
+    //turn the array into a string
+    let checkString = ""
+    for(let i = 0; i < currNotesTonal.length; i++){
+        checkString += currNotesTonal[i] + ","
+    }
+
+    let chordType = root;
+
+    console.log(checkString)
+
+    //match the pattern
+    switch(checkString){
+
+        //intervals
+        // case "0":
+        //     chordType = "unison"
+        //     break;
+        
+        // case "0,1,":
+        //     chordType = "minor second"
+        //     break;
+
+        //triads
+        case "0,3,7,":
+            chordType += " Minor"
+            break;
+
+        case "0,4,7,":
+            chordType += " Major"
+            break;
+
+        case "0,4,8,":
+            chordType += " Augmented"
+            break;
+    
+        case "0,3,6,":
+            chordType += " Diminished"
+            break;
+
+        //seventh chords
+        case "0,3,6,9,":
+            chordType += " Diminished Seventh"
+            break;
+
+        case "0,4,7,10,":
+            chordType += " Dominant Seventh"
+            break;
+
+        case "0,4,7,11,":
+            chordType += " Major Seventh"
+            break;
+
+        case "0,3,7,10,":
+            chordType += " Minor Seventh"
+            break;
+
+        case "0,3,7,11,":
+            chordType += " Minor Major Seventh"
+            break;
+
+        case "0,3,6,10,":
+            chordType += " Half Diminished Seventh"
+            break;
+
+        default:
+            chordType = "Unrecognized"
+            break;
+
+    }
+
+    return chordType;
 
 }
 
@@ -1045,7 +1233,7 @@ function drawCanvas(){
 
     ctx.fillStyle = "black"
     ctx.font = "45px Arial"
-    ctx.fillText("Chord Identifier", 30, 60)
+    ctx.fillText("Chord Identifier", 20, 60)
     
     let startX = canvas.width/(2.5 * scale)
     let endX = canvas.width/scale - canvas.width/(50 * scale)
@@ -1053,7 +1241,7 @@ function drawCanvas(){
 
     ctx.fillStyle = "grey"
     ctx.font = "15px Arial"
-    ctx.fillText("By Paul", 30, 80)
+    ctx.fillText("By Paul", 20, 80)
     ctx.fillText("Select key using", 20, 150)
     ctx.fillText("wheel:", 20, 170)
     ctx.fillText("Hover over box to insert chord notes below:", startX + width/2, 30)
@@ -1066,6 +1254,9 @@ function drawCanvas(){
     ctx.font = "30px Arial"
     ctx.textAlign = "center"
     ctx.fillText("Key: " + key, keyX, keyY + 15)
+
+    ctx.textAlign = "left"
+    ctx.fillText(chordNames, 100, 700)
 
     drawStaff()
 }
