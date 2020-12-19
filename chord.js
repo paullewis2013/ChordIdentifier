@@ -514,9 +514,9 @@ function drawKeyWheel(){
 function initButtons(){
 
     let x = keyX - ((190/1440) * (canvas.width/scale))
-    let y = keyY + ((230/1440) * (canvas.width/scale))
+    let y = keyY + ((230/798) * (canvas.height/scale))
     let w = ((180/1440) * (canvas.width/scale))
-    let h = ((50/1440) * (canvas.width/scale))
+    let h = ((50/798) * (canvas.height/scale))
     let radius = ((10/1440) * (canvas.width/scale))
 
     minorButtonPath = new Path2D()
@@ -636,19 +636,19 @@ function drawButtons(){
 
     //button text
     ctx.fillStyle = "black"
-    ctx.font = "25px Arial"
+    ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Minor", minorButtonX, minorButtonY + 10)
+    ctx.fillText("Minor", minorButtonX, minorButtonY + (10/798) * canvas.height/scale)
 
     ctx.fillStyle = "black"
-    ctx.font = "25px Arial"
+    ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Enharmonics", enharmonicButtonX, enharmonicButtonY + 10)
+    ctx.fillText("Enharmonics", enharmonicButtonX, enharmonicButtonY + (10/798) * canvas.height/scale)
     
     ctx.fillStyle = "black"
-    ctx.font = "25px Arial"
+    ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Clear Notes", clearButtonX, clearButtonY + 10)
+    ctx.fillText("Clear Notes", clearButtonX, clearButtonY + (10/798) * canvas.height/scale)
 }
 
 function initNotesDisplay(){
@@ -836,8 +836,8 @@ function drawStaff(){
     ctx.stroke()
 
     //draw clef images
-    ctx.drawImage(images[0], canvas.width/(2.66 * scale), startY - 0.3 *  height/10, 200, 5 * height/10)
-    ctx.drawImage(images[1], canvas.width/(2.4 * scale), startY + 6 * height/10, 100, 3 * height/10)
+    ctx.drawImage(images[0], canvas.width/(2.66 * scale), startY - 0.3 *  height/10, ((200/1440) * canvas.width/scale), 5 * height/10)
+    ctx.drawImage(images[1], canvas.width/(2.4 * scale), startY + 6 * height/10, ((100/1440) * canvas.width/scale), 3 * height/10)
 
 
     //draw key signature
@@ -1248,18 +1248,22 @@ function determineChordType(root, currNotesTonal){
             break;
 
         case "0,4,7,10,":
+        case "0,4,10,":
             chordType += " Dominant Seventh"
             break;
 
         case "0,4,7,11,":
+        case "0,4,11,":
             chordType += " Major Seventh"
             break;
 
         case "0,3,7,10,":
+        case "0,3,10,":
             chordType += " Minor Seventh"
             break;
 
         case "0,3,7,11,":
+        case "0,3,11,":
             chordType += " Minor Major Seventh"
             break;
 
@@ -1284,31 +1288,31 @@ function drawCanvas(){
     ctx.fill()
 
     ctx.fillStyle = "black"
-    ctx.font = "45px Arial"
-    ctx.fillText("Chord Identifier", 20, 60)
+    ctx.font = Math.floor((45/1440) * (canvas.width/scale)) + "px Arial"
+    ctx.fillText("Chord Identifier", ((20/1440) * (canvas.width/scale)), ((60/798) * (canvas.height/scale)))
     
     let startX = canvas.width/(2.5 * scale)
     let endX = canvas.width/scale - canvas.width/(50 * scale)
     let width = endX - startX
 
     ctx.fillStyle = "grey"
-    ctx.font = "15px Arial"
-    ctx.fillText("By Paul", 20, 80)
-    ctx.fillText("Select key using", 20, 150)
-    ctx.fillText("wheel:", 20, 170)
-    ctx.fillText("Hover over box to insert chord notes below:", startX + width/2, 30)
+    ctx.font = Math.floor((15/1440) * (canvas.width/scale)) + "px Arial"
+    ctx.fillText("By Paul", ((20/1440) * (canvas.width/scale)), ((80/798) * (canvas.height/scale)))
+    ctx.fillText("Select key using", ((20/1440) * (canvas.width/scale)), ((150/798) * (canvas.height/scale)))
+    ctx.fillText("wheel:", ((20/1440) * (canvas.width/scale)), ((170/798) * (canvas.height/scale)))
+    ctx.fillText("Hover over box to insert chord notes below:", startX + width/2, ((30/798) * canvas.height/scale))
 
     drawKeyWheel()
     drawButtons()
     drawNotesDisplay()
 
     ctx.fillStyle = "black"
-    ctx.font = "30px Arial"
+    ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Key: " + key, keyX, keyY + 15)
+    ctx.fillText("Key: " + key, keyX, keyY + (15/798) * canvas.height/scale)
 
     ctx.textAlign = "left"
-    ctx.fillText(chordNames, 100, 700)
+    ctx.fillText(chordNames, ((100/1440) * (canvas.width/scale)), ((700/798) * (canvas.height/scale)))
 
     drawStaff()
 }
