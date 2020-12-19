@@ -885,7 +885,7 @@ function drawStaff(){
             noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
             noteSnapped = true;
 
-            let notePosition = Math.floor((startY + height * 1.2)/(height * 0.05) - noteY/(height * 0.05))
+            let notePosition = Math.floor((startY + height * 1.55)/(height * 0.05) - noteY/(height * 0.05))
             notePosition = notePosition % 7
             notePosition -= 3
             if(notePosition <= 0){notePosition += 7}
