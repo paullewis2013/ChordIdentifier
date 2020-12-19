@@ -495,7 +495,7 @@ function drawKeyWheel(){
 
     for(let i = 0; i < 12; i++){
 
-        ctx.font = "30px Arial"
+        ctx.font = Math.floor(30/1440 * canvas.width/scale) + "px Arial"
 
         let x = keyX + ((160/1440) * (canvas.width/scale)) * Math.cos(angle)
         let y = keyY + ((160/1440) * (canvas.width/scale)) * Math.sin(angle) + 10 
@@ -910,7 +910,7 @@ function drawStaff(){
     noteInputPath = new Path2D();
 
     ctx.beginPath()
-    noteInputPath.rect(startX + width/2, startY - height * .3, width * .4, height * 1.5)
+    noteInputPath.rect(startX + width/2, startY - height * .3, width * .4, height * 1.8)
     ctx.closePath()
 
     ctx.strokeStyle = "grey"
@@ -925,8 +925,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, notes[i].noteY)
-            ctx.lineTo(noteX + 50, notes[i].noteY)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, notes[i].noteY)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, notes[i].noteY)
             ctx.stroke()
             
         }
@@ -935,8 +935,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, startY - height * .1)
-            ctx.lineTo(noteX + 50, startY - height * .1)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY - height * .1)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .1)
             ctx.stroke()
         }
         if(notes[i].noteY <= startY - height * .19){
@@ -944,8 +944,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, startY - height * .2)
-            ctx.lineTo(noteX + 50, startY - height * .2)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY - height * .2)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .2)
             ctx.stroke()
         }
         if(notes[i].noteY >= startY + height * 1.09){
@@ -953,8 +953,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, startY + height * 1.1)
-            ctx.lineTo(noteX + 50, startY + height * 1.1)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.1)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.1)
             ctx.stroke()
         }
 
@@ -975,8 +975,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, noteY)
-            ctx.lineTo(noteX + 50, noteY)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, noteY)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, noteY)
             ctx.stroke()
             
         }
@@ -985,8 +985,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, startY - height * .1)
-            ctx.lineTo(noteX + 50, startY - height * .1)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY - height * .1)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .1)
             ctx.stroke()
         }
         if(noteY <= startY - height * .19){
@@ -994,8 +994,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, startY - height * .2)
-            ctx.lineTo(noteX + 50, startY - height * .2)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY - height * .2)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .2)
             ctx.stroke()
         }
         if(noteY >= startY + height * 1.09){
@@ -1003,8 +1003,8 @@ function drawStaff(){
             ctx.lineWidth = 1
 
             ctx.beginPath()
-            ctx.moveTo(noteX - 50, startY + height * 1.1)
-            ctx.lineTo(noteX + 50, startY + height * 1.1)
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.1)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.1)
             ctx.stroke()
         }
 
@@ -1281,6 +1281,63 @@ function determineChordType(root, currNotesTonal){
 
 }
 
+function drawOutput(){
+
+    let x = keyX - ((190/1440) * (canvas.width/scale))
+    let y = keyY + ((300/798) * (canvas.height/scale))
+    let w = ((710/1440) * (canvas.width/scale))
+    let h = ((120/798) * (canvas.height/scale))
+    let radius = ((10/1440) * (canvas.width/scale))
+
+    outputPath = new Path2D()
+
+    let r = x + w;
+    let b = y + h;
+    ctx.beginPath()
+    outputPath.moveTo(x+radius, y);
+    outputPath.lineTo(r-radius, y);
+    outputPath.quadraticCurveTo(r, y, r, y+radius);
+    outputPath.lineTo(r, y+h-radius);
+    outputPath.quadraticCurveTo(r, b, r-radius, b);
+    outputPath.lineTo(x+radius, b);
+    outputPath.quadraticCurveTo(x, b, x, b-radius);
+    outputPath.lineTo(x, y+radius);
+    outputPath.quadraticCurveTo(x, y, x+radius, y);
+    ctx.closePath()
+
+    ctx.strokeStyle = "black"
+    ctx.lineWidth = "2"
+    ctx.stroke(outputPath)
+    ctx.fillStyle = "#ffffff"
+    ctx.fill(outputPath)
+
+    ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
+    ctx.fillStyle = "black"
+    ctx.textAlign = "left"
+    if(notes.length == 0){
+        ctx.fillText("Input notes on the staff to calculate a chord", ((100/1440) * (canvas.width/scale)), y + h/2)
+    }else if(notes.length == 1){
+        ctx.fillText("Input more notes on the staff to calculate a chord", ((80/1440) * (canvas.width/scale)), y + h/2)
+    }
+    else{
+        ctx.font = Math.floor(h/5) + "px Arial"
+        let printX = ((70/1440) * (canvas.width/scale))
+        let printY = ((700/798) * (canvas.height/scale))
+        ctx.fillText("Possible names:", printX, printY - h/10)
+        
+        let fontH = Math.floor(h/(chordNames.length + 2))
+        ctx.font = fontH + "px Arial"
+        
+        printY += h/4
+        
+        for(let i = 0; i < chordNames.length; i++){
+            ctx.fillText(chordNames[i], printX * 4, printY + i * h/(chordNames.length + 2))
+        }
+    }
+    
+
+}
+
 function drawCanvas(){
     ctx.fillStyle = "#F9F1F1"
     ctx.textAlign = "left"
@@ -1311,10 +1368,8 @@ function drawCanvas(){
     ctx.textAlign = "center"
     ctx.fillText("Key: " + key, keyX, keyY + (15/798) * canvas.height/scale)
 
-    ctx.textAlign = "left"
-    ctx.fillText(chordNames, ((100/1440) * (canvas.width/scale)), ((700/798) * (canvas.height/scale)))
-
     drawStaff()
+    drawOutput()
 }
 
 //create a global object to track animation changes
