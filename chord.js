@@ -440,8 +440,8 @@ function initKeyWheel(){
     for(let i = 0; i < 12; i++){
 
         //inner/outer radius
-        let innerR = 125
-        let outerR = 200
+        let innerR = (125/1440) * (canvas.width/scale)
+        let outerR = (200/1440) * (canvas.width/scale)
 
         if(hovered == i){
             outerR += 30 * Math.sin(aState.angle)
@@ -497,8 +497,8 @@ function drawKeyWheel(){
 
         ctx.font = "30px Arial"
 
-        let x = keyX + 160 * Math.cos(angle)
-        let y = keyY + 160 * Math.sin(angle) + 10 
+        let x = keyX + ((160/1440) * (canvas.width/scale)) * Math.cos(angle)
+        let y = keyY + ((160/1440) * (canvas.width/scale)) * Math.sin(angle) + 10 
 
         ctx.fillStyle = "black"
         ctx.textAlign = "center"
@@ -513,11 +513,11 @@ function drawKeyWheel(){
 //define paths for buttons 
 function initButtons(){
 
-    let x = keyX - 190
-    let y = keyY + 230
-    let w = 180
-    let h = 50
-    let radius = 10
+    let x = keyX - ((190/1440) * (canvas.width/scale))
+    let y = keyY + ((230/1440) * (canvas.width/scale))
+    let w = ((180/1440) * (canvas.width/scale))
+    let h = ((50/1440) * (canvas.width/scale))
+    let radius = ((10/1440) * (canvas.width/scale))
 
     minorButtonPath = new Path2D()
 
@@ -538,7 +538,7 @@ function initButtons(){
     minorButtonX = x + w/2
     minorButtonY = y + h/2
 
-    x += 200;
+    x += ((200/1440) * (canvas.width/scale));
 
     enharmonicButtonPath = new Path2D()
 
@@ -1133,7 +1133,7 @@ function calcChordNames(){
         }
 
         //sort the new array
-        // currNotesTonal.sort((a,b) => a - b)
+        currNotesTonal.sort((a,b) => a - b)
 
         let chordType = determineChordType(root, currNotesTonal)
 
@@ -1165,20 +1165,64 @@ function determineChordType(root, currNotesTonal){
     switch(checkString){
 
         //intervals
-        // case "0":
-        //     chordType = "unison"
+        // case "0,":
+        //     chordType += "(unison)"
         //     break;
         
-        // case "0,1,":
-        //     chordType = "minor second"
-        //     break;
+        case "0,1,":
+            chordType += " (w/ minor second interval)"
+            break;
+
+        case "0,2,":
+            chordType += " (w/ major second interval)"
+            break;
+
+        case "0,3,":
+            chordType += " (w/ minor third interval)"
+            break;
+
+        case "0,4,":
+            chordType += " (w/ major third interval)"
+            break;
+
+        case "0,5,":
+            chordType += " (w/ perfect fourth interval)"
+            break;
+
+        case "0,6,":
+            chordType += " (w/ tritone interval)"
+            break;
+
+        case "0,7,":
+            chordType += " (w/ perfect fifth interval)"
+            break;
+
+        case "0,8,":
+            chordType += " (w/ minor sixth interval)"
+            break;
+
+        case "0,9,":
+            chordType += " (w/ major sixth interval)"
+            break;
+
+        case "0,10,":
+            chordType += " (w/ minor seventh interval)"
+            break;
+
+        case "0,11,":
+            chordType += " (w/ major seventh interval)"
+            break;
 
         //triads
         case "0,3,7,":
+        case "3,7,0,":
+        case "7,0,3,":
             chordType += " Minor"
             break;
 
         case "0,4,7,":
+        case "4,7,0,":
+        case "7,4,0,":
             chordType += " Major"
             break;
 
@@ -1188,6 +1232,14 @@ function determineChordType(root, currNotesTonal){
     
         case "0,3,6,":
             chordType += " Diminished"
+            break;
+
+        case "0,5,7,":
+            chordType += " Suspended Fourth"
+            break;
+
+        case "0,2,7,":
+            chordType += " Suspended Second"
             break;
 
         //seventh chords
