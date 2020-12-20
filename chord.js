@@ -696,7 +696,7 @@ function drawNotesDisplay(){
     ctx.textAlign = "center"
     ctx.fillText("Notes:", noteDisplayX + 150, noteDisplayY + 20)
 
-    let notesAsString = "{"
+    let notesAsString = ""
 
     for(let i = 0; i < notes.length; i++){
         notesAsString += " " + notes[i].hoveredNoteName 
@@ -707,10 +707,10 @@ function drawNotesDisplay(){
         }
     }
 
-    notesAsString += "}"
+    notesAsString += ""
 
-    ctx.textAlign = "left"
-    ctx.fillText(notesAsString, noteDisplayX + 5, noteDisplayY + 50)
+    ctx.textAlign = "center"
+    ctx.fillText(notesAsString, noteDisplayX + 150, noteDisplayY + 50)
 
 }
 
@@ -881,8 +881,8 @@ function drawStaff(){
 
         let noteName = "";
 
-        if(!noteSnapped){
-            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+        //if(!noteSnapped){
+            noteY = Math.floor(noteY / (height * 0.05)) * (height * 0.05)
             noteSnapped = true;
 
             let notePosition = Math.floor((startY + height * 1.55)/(height * 0.05) - noteY/(height * 0.05))
@@ -900,7 +900,7 @@ function drawStaff(){
             // console.log(noteName)
 
             hoveredNoteName = noteName
-        }
+        // }
         
         
 
@@ -916,10 +916,15 @@ function drawStaff(){
     ctx.strokeStyle = "grey"
     ctx.stroke(noteInputPath)
 
+    let lastNoteShifted = false;
+
     //draw notes
     for(let i = 0; i < notes.length; i++){
 
-        //ledger lines if necesary
+        //reset noteX in case necesary 
+        noteX = startX + width * .7
+        
+        //draw ledger lines if necesary
 
         //middle c
         if(Math.abs(notes[i].noteY - (startY + height/2)) < 1){
@@ -1005,8 +1010,19 @@ function drawStaff(){
         // ctx.beginPath()
         // ctx.arc(noteX, notes[i].noteY, height * 0.05, 0, 2 * Math.PI, false)
         // ctx.fill()
+
+        //check if note above or below would overlap
+        if((i > 0 && notes[i - 1].noteY - notes[i].noteY < height * .06) && !lastNoteShifted){
+            noteX += width * .07
+            lastNoteShifted = true
+        }else{
+            lastNoteShifted = false
+        }
+
         let notewidth = height * .15
         ctx.drawImage(images[5], noteX - notewidth/2, notes[i].noteY - height * .05, notewidth, height * .1)
+
+        noteX = startX + width * .7
     }
 
     if(hoveredNote){
