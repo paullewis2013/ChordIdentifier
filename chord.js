@@ -531,7 +531,7 @@ function drawKeyWheel(){
         let x = keyX + ((160/1440) * (canvas.width/scale)) * Math.cos(angle)
         let y = keyY + ((160/1440) * (canvas.width/scale)) * Math.sin(angle) + 10 
 
-        ctx.fillStyle = "black"
+        ctx.fillStyle = "#001a35"
         ctx.textAlign = "center"
         ctx.fillText(calcKey(i, false), x, y)
 
@@ -726,7 +726,7 @@ function initNotesDisplay(){
     let x = canvas.width/(2.5 * scale)
     let y = startY - height * .4
     let w = 1000/1440 * canvas.width/scale
-    let h = 80/798 * canvas.height/scale
+    let h = 70/798 * canvas.height/scale
     let radius = h
 
     noteDisplayPath = new Path2D()
@@ -873,12 +873,12 @@ function drawStaff(){
 
     noteInputPath = new Path2D();
     noteInputX = startX + width * .6
-    noteInputY = startY - height * .3;
+    noteInputY = startY - height * .25;
     ctx.beginPath()
-    noteInputPath.rect(noteInputX, noteInputY, width * .4, height * 1.8)
+    noteInputPath.rect(noteInputX, noteInputY, width * .4, height * 1.7)
     ctx.closePath()
 
-    ctx.lineWidth = 2
+    ctx.lineWidth = 0.5
     ctx.strokeStyle = "#001a35"
     ctx.stroke(noteInputPath)
     ctx.fillStyle = "#fff1f1"
@@ -993,7 +993,7 @@ function drawStaff(){
         
     }
 
-    ctx.lineWidth = 2
+    ctx.lineWidth = 0.5
     ctx.strokeStyle = "#005b96"
     ctx.stroke(noteInputPath)
 
@@ -1478,7 +1478,7 @@ function drawOutput(){
     ctx.fill()
 
     let x = keyX - ((190/1440) * (canvas.width/scale))
-    let y = keyY + ((340/798) * (canvas.height/scale))
+    let y = keyY + ((350/798) * (canvas.height/scale))
     let w = ((720/1440) * (canvas.width/scale))
     let h = ((130/798) * (canvas.height/scale))
     let radius = h/2
@@ -1514,7 +1514,7 @@ function drawOutput(){
         ctx.fillText("Possible Name(s):", ((10/1440) * (canvas.width/scale)), y + h/4)
         ctx.font = Math.floor(h/5) + "px Arial"
         let printX = ((70/1440) * (canvas.width/scale))
-        let printY = ((700/798) * (canvas.height/scale))
+        let printY = y + ((10/798) * (canvas.height/scale))
         // ctx.fillText("Possible names:", printX, printY - h/10)
         
         let fontH = Math.floor(h/(chordNames.length + 2))
@@ -1567,11 +1567,24 @@ function drawEditButton(){
 function drawCanvas(){
 
     //background color
-    ctx.fillStyle = "#ffe5e5"
+    ctx.fillStyle = "#ffeeee"
     ctx.beginPath()
     ctx.rect(0,0,canvas.width/scale, canvas.height/scale)
     ctx.fill()
     ctx.closePath()
+
+    //embellishment
+    ctx.beginPath()
+    ctx.moveTo(0, keyY + (250/1440) * canvas.width/scale)
+    ctx.lineTo(keyX, keyY + (250/1440) * canvas.width/scale)
+    ctx.arc(keyX, keyY, (250/1440) * canvas.width/scale, Math.PI/2, Math.PI * 1.25, true)
+    ctx.lineTo(-keyX + 125/1440 * canvas.width/scale, keyY)
+    // ctx.arc(keyX + (325/798) * canvas.height/scale * Math.cos(Math.PI * 1.75), keyY + (325/798) * canvas.height/scale * Math.sin(Math.PI * 1.75), (75/798) * canvas.height/scale, .8 * Math.PI, 1.5 * Math.PI, false)
+    ctx.strokeStyle = "#001a35"
+    ctx.lineWidth = 15/798 * canvas.height/scale
+    ctx.stroke()
+    ctx.fillStyle = "#001a35"
+    ctx.fill()
 
     //dark box for title
     ctx.fillStyle = "#001a35"
@@ -1605,7 +1618,7 @@ function drawCanvas(){
     drawButtons()
     
 
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "#ffeeee"
     ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
     ctx.textAlign = "center"
     ctx.fillText("Key: " + key, keyX, keyY + (15/798) * canvas.height/scale)
@@ -1613,6 +1626,8 @@ function drawCanvas(){
     
     drawOutput()
     drawStaff()
+
+    
 }
 
 //create a global object to track animation changes
