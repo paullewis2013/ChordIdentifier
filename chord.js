@@ -31,6 +31,7 @@ var showEnharmonics = false;
 var minorButtonPath;
 var enharmonicButtonPath;
 var minorButtonHovered;
+var editButtonPath;
 var enharmonicButtonHovered;
 var minorButtonX;
 var minorButtonY;
@@ -40,6 +41,9 @@ var clearButtonPath;
 var clearButtonHovered;
 var clearButtonX;
 var clearButtonY;
+var editButtonX;
+var editButtonY;
+var editButtonHovered = false;
 
 var numSharps = 0;
 var numFlats = 0;
@@ -103,6 +107,9 @@ canvas.addEventListener('mousemove', function(e) {
     for(let i = 0; i < paths.length; i++){
 
         if(ctx.isPointInPath(paths[i], e.offsetX * scale, e.offsetY * scale)){
+            
+            document.body.style.cursor = "pointer"
+
             found = true;
 
             if(hovered != i){
@@ -114,28 +121,39 @@ canvas.addEventListener('mousemove', function(e) {
         }
     }
     if(!found){
+        document.body.style.cursor = "default"
         hovered = null;
     }
 
     //check buttons
     if(ctx.isPointInPath(minorButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
+        document.body.style.cursor = "pointer"
         minorButtonHovered = true
         
     }else{minorButtonHovered = false}
     if(ctx.isPointInPath(enharmonicButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
+        document.body.style.cursor = "pointer"
         enharmonicButtonHovered = true
         
     }else{enharmonicButtonHovered = false}
     if(ctx.isPointInPath(clearButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
+        document.body.style.cursor = "pointer"
         clearButtonHovered = true
         
     }else{clearButtonHovered = false}
+    if(ctx.isPointInPath(editButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        document.body.style.cursor = "pointer"
+        editButtonHovered = true
+        
+    }else{editButtonHovered = false}
 
     if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
 
+        document.body.style.cursor = "pointer"
         hoveredNote = true
         noteSnapped = false
 
@@ -580,6 +598,30 @@ function initButtons(){
 
     clearButtonX = x + w/2
     clearButtonY = y + h/2
+
+    //edit button
+    editButtonPath = new Path2D()
+
+    
+    x += ((200/1440) * (canvas.width/scale));
+    r = x + w;
+    b = y + h;
+    ctx.beginPath()
+    editButtonPath.moveTo(x+radius, y);
+    editButtonPath.lineTo(r-radius, y);
+    editButtonPath.quadraticCurveTo(r, y, r, y+radius);
+    editButtonPath.lineTo(r, y+h-radius);
+    editButtonPath.quadraticCurveTo(r, b, r-radius, b);
+    editButtonPath.lineTo(x+radius, b);
+    editButtonPath.quadraticCurveTo(x, b, x, b-radius);
+    editButtonPath.lineTo(x, y+radius);
+    editButtonPath.quadraticCurveTo(x, y, x+radius, y);
+    ctx.closePath()
+
+    editButtonX = x + w/2
+    editButtonY = y + h/2
+
+
 }
 
 function drawButtons(){
@@ -649,6 +691,8 @@ function drawButtons(){
     ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
     ctx.textAlign = "center"
     ctx.fillText("Clear Notes", clearButtonX, clearButtonY + (10/798) * canvas.height/scale)
+
+    drawEditButton()
 }
 
 function initNotesDisplay(){
@@ -658,8 +702,8 @@ function initNotesDisplay(){
 
     let x = canvas.width/(2.5 * scale)
     let y = startY - height * .3
-    let w = 300
-    let h = 60
+    let w = 400/1440 * canvas.width/scale
+    let h = 60/798 * canvas.height/scale
     let radius = 10
 
     noteDisplayPath = new Path2D()
@@ -694,7 +738,7 @@ function drawNotesDisplay(){
     ctx.fillStyle = "black"
     ctx.font = "20px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Notes:", noteDisplayX + 150, noteDisplayY + 20)
+    ctx.fillText("Notes:", noteDisplayX + 200, noteDisplayY + 20)
 
     let notesAsString = ""
 
@@ -710,7 +754,7 @@ function drawNotesDisplay(){
     notesAsString += ""
 
     ctx.textAlign = "center"
-    ctx.fillText(notesAsString, noteDisplayX + 150, noteDisplayY + 50)
+    ctx.fillText(notesAsString, noteDisplayX + 200, noteDisplayY + 50)
 
 }
 
@@ -1443,6 +1487,38 @@ function drawOutput(){
         }
     }
     
+
+}
+
+function drawEditButton(){
+
+    //draw path for button
+    let strokeColor = "red"
+    let hoveredFill = "#ffcccb"
+
+    //button shapes
+    ctx.fillStyle = "white"
+    if(editButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    ctx.fill(editButtonPath)
+
+    //stroke edit button
+    //button strokes
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
+    ctx.stroke(editButtonPath)
+
+    if(showMinor){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = strokeColor
+        ctx.stroke(editButtonPath)
+    }
+
+    //draw arrow
+
+
+    //draw text
 
 }
 
