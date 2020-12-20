@@ -28,6 +28,7 @@ var hovered = null;
 //for the key wheel and buttons
 var showMinor = false;
 var showEnharmonics = false;
+var editing = false;
 var minorButtonPath;
 var enharmonicButtonPath;
 var minorButtonHovered;
@@ -44,6 +45,10 @@ var clearButtonY;
 var editButtonX;
 var editButtonY;
 var editButtonHovered = false;
+var editDrop = 0;
+
+var noteInputX;
+var noteInputY;
 
 var numSharps = 0;
 var numFlats = 0;
@@ -91,7 +96,8 @@ var imageSrcs = ["assets/treble.svg",
                 "assets/Flat.png",
                 "assets/Sharp.png",
                 "assets/Natural.png",
-                "assets/Stemless notehead filled in.png"
+                "assets/Stemless notehead filled in.png",
+                "assets/arrow.svg"
                 ];
 
 var images = [];
@@ -221,6 +227,7 @@ canvas.addEventListener('mousedown', function(e) {
     if(hoveredNote){
 
         let dup = false
+        let dupIndex = -1
 
         let height = canvas.height/(2 * scale)
         noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
@@ -229,6 +236,7 @@ canvas.addEventListener('mousedown', function(e) {
         for(let i = 0; i < notes.length; i++){
             if(Math.abs((notes[i].noteY) - noteY) < 1){
                 dup = true
+                dupIndex = i
             }
         }
 
@@ -238,6 +246,11 @@ canvas.addEventListener('mousedown', function(e) {
             //every time a note is added resort the notes to be in acsending order
             notes.sort((a, b) => (a.noteY < b.noteY) ? 1 : -1)
 
+            chordNames = calcChordNames()
+        }
+
+        if(dup){
+            notes.splice(dupIndex, 1)
             chordNames = calcChordNames()
         }
         
@@ -499,7 +512,7 @@ function drawKeyWheel(){
         ctx.fillStyle = "white"
 
         if(keyIndex == i){
-            ctx.fillStyle = "red"
+            ctx.fillStyle = "#ff5252"
         }else if(hovered == i){
             ctx.fillStyle = "#ffcccb"
         }
@@ -604,6 +617,9 @@ function initButtons(){
 
     
     x += ((200/1440) * (canvas.width/scale));
+
+    w = ((280/1440) * (canvas.width/scale))
+
     r = x + w;
     b = y + h;
     ctx.beginPath()
@@ -626,8 +642,8 @@ function initButtons(){
 
 function drawButtons(){
 
-    let strokeColor = "red"
-    let hoveredFill = "#ffcccb"
+    let strokeColor = "#ff5252"
+    let hoveredFill = "#fffeb3"//#fffeb3
 
     //button shapes
     ctx.fillStyle = "white"
@@ -698,28 +714,26 @@ function drawButtons(){
 function initNotesDisplay(){
 
     let height = canvas.height/(2 * scale)
-    let startY =  keyY - height/2
+    let startY = keyY - height/2
 
     let x = canvas.width/(2.5 * scale)
-    let y = startY - height * .3
-    let w = 400/1440 * canvas.width/scale
-    let h = 60/798 * canvas.height/scale
-    let radius = 10
+    let y = startY - height * .4
+    let w = 1000/1440 * canvas.width/scale
+    let h = 80/798 * canvas.height/scale
+    let radius = h
 
     noteDisplayPath = new Path2D()
 
     let r = x + w;
     let b = y + h;
     ctx.beginPath()
-    noteDisplayPath.moveTo(x+radius, y);
-    noteDisplayPath.lineTo(r-radius, y);
-    noteDisplayPath.quadraticCurveTo(r, y, r, y+radius);
-    noteDisplayPath.lineTo(r, y+h-radius);
-    noteDisplayPath.quadraticCurveTo(r, b, r-radius, b);
-    noteDisplayPath.lineTo(x+radius, b);
-    noteDisplayPath.quadraticCurveTo(x, b, x, b-radius);
-    noteDisplayPath.lineTo(x, y+radius);
-    noteDisplayPath.quadraticCurveTo(x, y, x+radius, y);
+    noteDisplayPath.moveTo(x-radius, y);
+    noteDisplayPath.lineTo(x+w, y);
+    noteDisplayPath.lineTo(x+w, b);
+    noteDisplayPath.lineTo(x, b);
+    noteDisplayPath.quadraticCurveTo(x-radius, b, x-radius, y);
+    // noteDisplayPath.lineTo(x, y+radius);
+    // noteDisplayPath.quadraticCurveTo(x, y, x+radius, y);
     ctx.closePath()
 
     noteDisplayX = x
@@ -728,14 +742,14 @@ function initNotesDisplay(){
 
 function drawNotesDisplay(){
 
-    ctx.fillStyle = "white"
+    ctx.fillStyle = "#005b96"
     ctx.fill(noteDisplayPath)
 
     ctx.strokeStyle = "black"
     ctx.lineWidth = 1
     ctx.stroke(noteDisplayPath)
 
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "white"
     ctx.font = "20px Arial"
     ctx.textAlign = "center"
     ctx.fillText("Notes:", noteDisplayX + 200, noteDisplayY + 20)
@@ -754,7 +768,14 @@ function drawNotesDisplay(){
     notesAsString += ""
 
     ctx.textAlign = "center"
-    ctx.fillText(notesAsString, noteDisplayX + 200, noteDisplayY + 50)
+    ctx.fillText(notesAsString, noteDisplayX + 200, noteDisplayY + 60)
+
+
+    // ctx.fillStyle = "#001a35"
+    // ctx.fillStyle = "#005b96"
+    // ctx.beginPath()
+    // ctx.rect(noteInputX - 1, 0, 1000, noteInputY)
+    // ctx.fill()
 
 }
 
@@ -842,6 +863,20 @@ function drawStaff(){
     let startY =  keyY - height/2
     let width = endX - startX;
 
+
+    noteInputPath = new Path2D();
+    noteInputX = startX + width * .6
+    noteInputY = startY - height * .3;
+    ctx.beginPath()
+    noteInputPath.rect(noteInputX, noteInputY, width * .4, height * 1.8)
+    ctx.closePath()
+
+    ctx.lineWidth = 2
+    ctx.strokeStyle = "#001a35"
+    ctx.stroke(noteInputPath)
+    ctx.fillStyle = "#fff1f1"
+    ctx.fill(noteInputPath)
+
     //make two white boxes behind staff
     ctx.fillStyle = "white"
     ctx.rect(startX, startY, width, height * .4)
@@ -919,7 +954,7 @@ function drawStaff(){
 
 
     //draw notes in chord
-    noteX = startX + width * .7
+    noteX = startX + width * .8
 
     if(hoveredNote){
 
@@ -951,13 +986,8 @@ function drawStaff(){
         
     }
 
-    noteInputPath = new Path2D();
-
-    ctx.beginPath()
-    noteInputPath.rect(startX + width/2, startY - height * .3, width * .4, height * 1.8)
-    ctx.closePath()
-
-    ctx.strokeStyle = "grey"
+    ctx.lineWidth = 2
+    ctx.strokeStyle = "#005b96"
     ctx.stroke(noteInputPath)
 
     let lastNoteShifted = false;
@@ -966,7 +996,7 @@ function drawStaff(){
     for(let i = 0; i < notes.length; i++){
 
         //reset noteX in case necesary 
-        noteX = startX + width * .7
+        noteX = startX + width * .8
         
         //draw ledger lines if necesary
 
@@ -1066,7 +1096,7 @@ function drawStaff(){
         let notewidth = height * .15
         ctx.drawImage(images[5], noteX - notewidth/2, notes[i].noteY - height * .05, notewidth, height * .1)
 
-        noteX = startX + width * .7
+        noteX = startX + width * .8
     }
 
     if(hoveredNote){
@@ -1435,47 +1465,50 @@ function determineChordType(root, currNotesTonal){
 
 function drawOutput(){
 
+    ctx.fillStyle = "#001a35"
+    ctx.beginPath()
+    ctx.rect(canvas.width/(2*scale), (720/798) * canvas.height/scale, canvas.width/scale, canvas.height/scale)
+    ctx.fill()
+
     let x = keyX - ((190/1440) * (canvas.width/scale))
-    let y = keyY + ((300/798) * (canvas.height/scale))
+    let y = keyY + ((340/798) * (canvas.height/scale))
     let w = ((710/1440) * (canvas.width/scale))
-    let h = ((120/798) * (canvas.height/scale))
-    let radius = ((10/1440) * (canvas.width/scale))
+    let h = ((130/798) * (canvas.height/scale))
+    let radius = h/2
 
     outputPath = new Path2D()
 
     let r = x + w;
     let b = y + h;
     ctx.beginPath()
-    outputPath.moveTo(x+radius, y);
+    outputPath.moveTo(0, y);
     outputPath.lineTo(r-radius, y);
-    outputPath.quadraticCurveTo(r, y, r, y+radius);
-    outputPath.lineTo(r, y+h-radius);
-    outputPath.quadraticCurveTo(r, b, r-radius, b);
-    outputPath.lineTo(x+radius, b);
-    outputPath.quadraticCurveTo(x, b, x, b-radius);
-    outputPath.lineTo(x, y+radius);
-    outputPath.quadraticCurveTo(x, y, x+radius, y);
+    outputPath.quadraticCurveTo(r, y, r, b-radius);
+    outputPath.lineTo(r, b);
+    outputPath.lineTo(0, b);
+    outputPath.lineTo(0, y);
     ctx.closePath()
 
     ctx.strokeStyle = "black"
     ctx.lineWidth = "2"
     ctx.stroke(outputPath)
-    ctx.fillStyle = "#ffffff"
+    ctx.fillStyle = "#005b96"
     ctx.fill(outputPath)
 
     ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "white"
     ctx.textAlign = "left"
     if(notes.length == 0){
-        ctx.fillText("Input notes on the staff to calculate a chord", ((100/1440) * (canvas.width/scale)), y + h/2)
+        ctx.fillText("Input notes on the staff to calculate a chord", ((10/1440) * (canvas.width/scale)), y + h/4)
     }else if(notes.length == 1){
-        ctx.fillText("Input more notes on the staff to calculate a chord", ((80/1440) * (canvas.width/scale)), y + h/2)
+        ctx.fillText("Input more notes on the staff to calculate a chord", ((10/1440) * (canvas.width/scale)), y + h/4)
     }
     else{
+        ctx.fillText("Possible Name(s):", ((10/1440) * (canvas.width/scale)), y + h/4)
         ctx.font = Math.floor(h/5) + "px Arial"
         let printX = ((70/1440) * (canvas.width/scale))
         let printY = ((700/798) * (canvas.height/scale))
-        ctx.fillText("Possible names:", printX, printY - h/10)
+        // ctx.fillText("Possible names:", printX, printY - h/10)
         
         let fontH = Math.floor(h/(chordNames.length + 2))
         ctx.font = fontH + "px Arial"
@@ -1493,7 +1526,7 @@ function drawOutput(){
 function drawEditButton(){
 
     //draw path for button
-    let strokeColor = "red"
+    let strokeColor = "#ff5252"
     let hoveredFill = "#ffcccb"
 
     //button shapes
@@ -1509,51 +1542,70 @@ function drawEditButton(){
     ctx.strokeStyle = "black";
     ctx.stroke(editButtonPath)
 
-    if(showMinor){
+    if(editing){
         ctx.lineWidth = 4;
         ctx.strokeStyle = strokeColor
         ctx.stroke(editButtonPath)
     }
 
     //draw arrow
-
+    //use svg image downloaded today
+    ctx.drawImage(images[6], editButtonX - 140, editButtonY - 15, 30, 30)
 
     //draw text
+
 
 }
 
 function drawCanvas(){
-    ctx.fillStyle = "#F9F1F1"
-    ctx.textAlign = "left"
+
+    //background color
+    ctx.fillStyle = "#ffe5e5"
+    ctx.beginPath()
     ctx.rect(0,0,canvas.width/scale, canvas.height/scale)
     ctx.fill()
+    ctx.closePath()
 
-    ctx.fillStyle = "black"
-    ctx.font = Math.floor((45/1440) * (canvas.width/scale)) + "px Arial"
-    ctx.fillText("Chord Identifier", ((20/1440) * (canvas.width/scale)), ((60/798) * (canvas.height/scale)))
+    //dark box for title
+    ctx.fillStyle = "#001a35"
+    ctx.beginPath()
+    ctx.rect(0,0,canvas.width/scale, (65/798) * canvas.height/scale)
+    ctx.fill()
+    ctx.closePath()
+
+    drawNotesDisplay()
+
+    //title
+    ctx.fillStyle = "#ffe5e5"
+    ctx.font = Math.floor((60/1440) * (canvas.width/scale)) + "px Arial"
+    ctx.textAlign = "left"
+    ctx.fillText("Chord Identifier", ((20/1440) * (canvas.width/scale)), ((65/798) * (canvas.height/scale)))
     
     let startX = canvas.width/(2.5 * scale)
     let endX = canvas.width/scale - canvas.width/(50 * scale)
     let width = endX - startX
 
-    ctx.fillStyle = "grey"
+    ctx.fillStyle = "#001a35"
+    ctx.textAlign = "left"
     ctx.font = Math.floor((15/1440) * (canvas.width/scale)) + "px Arial"
-    ctx.fillText("By Paul", ((20/1440) * (canvas.width/scale)), ((80/798) * (canvas.height/scale)))
-    ctx.fillText("Select key using", ((20/1440) * (canvas.width/scale)), ((150/798) * (canvas.height/scale)))
-    ctx.fillText("wheel:", ((20/1440) * (canvas.width/scale)), ((170/798) * (canvas.height/scale)))
-    ctx.fillText("Hover over box to insert chord notes below:", startX + width/2, ((30/798) * canvas.height/scale))
+    ctx.fillText("By Paul", ((25/1440) * (canvas.width/scale)), ((85/798) * (canvas.height/scale)))
+    // ctx.fillText("Select key using", ((20/1440) * (canvas.width/scale)), ((150/798) * (canvas.height/scale)))
+    // ctx.fillText("wheel:", ((20/1440) * (canvas.width/scale)), ((170/798) * (canvas.height/scale)))
+    ctx.fillStyle = "white"
+    ctx.fillText("Hover over box to insert chord notes below:", noteInputX, ((30/798) * canvas.height/scale))
 
     drawKeyWheel()
     drawButtons()
-    drawNotesDisplay()
+    
 
     ctx.fillStyle = "black"
     ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
     ctx.textAlign = "center"
     ctx.fillText("Key: " + key, keyX, keyY + (15/798) * canvas.height/scale)
 
-    drawStaff()
+    
     drawOutput()
+    drawStaff()
 }
 
 //create a global object to track animation changes
