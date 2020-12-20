@@ -920,6 +920,8 @@ function drawStaff(){
     for(let i = 0; i < notes.length; i++){
 
         //ledger lines if necesary
+
+        //middle c
         if(Math.abs(notes[i].noteY - (startY + height/2)) < 1){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -930,6 +932,8 @@ function drawStaff(){
             ctx.stroke()
             
         }
+
+        //a above
         if(notes[i].noteY <= startY - height * .09){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -939,6 +943,8 @@ function drawStaff(){
             ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .1)
             ctx.stroke()
         }
+
+        //c above
         if(notes[i].noteY <= startY - height * .19){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -948,6 +954,8 @@ function drawStaff(){
             ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .2)
             ctx.stroke()
         }
+
+        //e below
         if(notes[i].noteY >= startY + height * 1.09){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -957,6 +965,40 @@ function drawStaff(){
             ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.1)
             ctx.stroke()
         }
+
+        //c below
+        if(notes[i].noteY >= startY + height * 1.19){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.2)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.2)
+            ctx.stroke()
+        }
+
+        //a below
+        if(notes[i].noteY >= startY + height * 1.29){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.3)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.3)
+            ctx.stroke()
+        }
+
+        //f below
+        if(notes[i].noteY >= startY + height * 1.39){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.4)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.4)
+            ctx.stroke()
+        }
+
 
 
         // ctx.fillStyle = "black"
@@ -970,6 +1012,8 @@ function drawStaff(){
     if(hoveredNote){
 
         //ledger lines if necesary
+
+        //middle c
         if(Math.abs(noteY - (startY + height/2)) < 1){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -980,6 +1024,8 @@ function drawStaff(){
             ctx.stroke()
             
         }
+
+        //a above
         if(noteY <= startY - height * .09){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -989,6 +1035,8 @@ function drawStaff(){
             ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .1)
             ctx.stroke()
         }
+
+        //c above
         if(noteY <= startY - height * .19){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -998,6 +1046,8 @@ function drawStaff(){
             ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY - height * .2)
             ctx.stroke()
         }
+
+        //e below
         if(noteY >= startY + height * 1.09){
             ctx.strokeStyle = "black"
             ctx.lineWidth = 1
@@ -1005,6 +1055,39 @@ function drawStaff(){
             ctx.beginPath()
             ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.1)
             ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.1)
+            ctx.stroke()
+        }
+
+        //c below
+        if(noteY >= startY + height * 1.19){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.2)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.2)
+            ctx.stroke()
+        }
+
+        //a below
+        if(noteY >= startY + height * 1.29){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.3)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.3)
+            ctx.stroke()
+        }
+
+        //f below
+        if(noteY >= startY + height * 1.39){
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 1
+
+            ctx.beginPath()
+            ctx.moveTo(noteX - (50/1440) * canvas.width/scale, startY + height * 1.4)
+            ctx.lineTo(noteX + (50/1440) * canvas.width/scale, startY + height * 1.4)
             ctx.stroke()
         }
 
@@ -1240,6 +1323,15 @@ function determineChordType(root, currNotesTonal){
 
         case "0,2,7,":
             chordType += " Suspended Second"
+            break;
+
+        //sixth chords
+        case "0,3,7,9,":
+            chordType += " Minor Sixth"
+            break;
+
+        case "0,4,7,9,":
+            chordType += " Major Sixth"
             break;
 
         //seventh chords
