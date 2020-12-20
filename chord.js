@@ -544,9 +544,9 @@ function drawKeyWheel(){
 //define paths for buttons 
 function initButtons(){
 
-    let x = keyX - ((190/1440) * (canvas.width/scale))
-    let y = keyY + ((230/798) * (canvas.height/scale))
-    let w = ((180/1440) * (canvas.width/scale))
+    let x = keyX - ((210/1440) * (canvas.width/scale))
+    let y = keyY + ((280/798) * (canvas.height/scale))
+    let w = ((200/1440) * (canvas.width/scale))
     let h = ((50/798) * (canvas.height/scale))
     let radius = ((10/1440) * (canvas.width/scale))
 
@@ -569,7 +569,7 @@ function initButtons(){
     minorButtonX = x + w/2
     minorButtonY = y + h/2
 
-    x += ((200/1440) * (canvas.width/scale));
+    x += ((220/1440) * (canvas.width/scale));
 
     enharmonicButtonPath = new Path2D()
 
@@ -616,9 +616,9 @@ function initButtons(){
     editButtonPath = new Path2D()
 
     
-    x += ((200/1440) * (canvas.width/scale));
+    x += ((220/1440) * (canvas.width/scale));
 
-    w = ((280/1440) * (canvas.width/scale))
+    w = ((260/1440) * (canvas.width/scale))
 
     r = x + w;
     b = y + h;
@@ -642,19 +642,26 @@ function initButtons(){
 
 function drawButtons(){
 
-    let strokeColor = "#ff5252"
-    let hoveredFill = "#fffeb3"//#fffeb3
+    let strokeColor = "#001a35"
+    let selectColor = "#ff7474"
+    let hoveredFill = "#ffcccb"//#fffeb3
 
     //button shapes
     ctx.fillStyle = "white"
     if(minorButtonHovered){
         ctx.fillStyle = hoveredFill
     }
+    if(showMinor){
+        ctx.fillStyle = selectColor
+    }
     ctx.fill(minorButtonPath)
 
     ctx.fillStyle = "white"
     if(enharmonicButtonHovered){
         ctx.fillStyle = hoveredFill
+    }
+    if(showEnharmonics){
+        ctx.fillStyle = selectColor
     }
     ctx.fill(enharmonicButtonPath)
 
@@ -1472,7 +1479,7 @@ function drawOutput(){
 
     let x = keyX - ((190/1440) * (canvas.width/scale))
     let y = keyY + ((340/798) * (canvas.height/scale))
-    let w = ((710/1440) * (canvas.width/scale))
+    let w = ((720/1440) * (canvas.width/scale))
     let h = ((130/798) * (canvas.height/scale))
     let radius = h/2
 
@@ -1526,7 +1533,7 @@ function drawOutput(){
 function drawEditButton(){
 
     //draw path for button
-    let strokeColor = "#ff5252"
+    let strokeColor = "#001a35"//"#ff5252"
     let hoveredFill = "#ffcccb"
 
     //button shapes
@@ -1550,7 +1557,7 @@ function drawEditButton(){
 
     //draw arrow
     //use svg image downloaded today
-    ctx.drawImage(images[6], editButtonX - 140, editButtonY - 15, 30, 30)
+    // ctx.drawImage(images[6], editButtonX - 140, editButtonY - 15, 30, 30)
 
     //draw text
 
