@@ -28,7 +28,6 @@ var hovered = null;
 //for the key wheel and buttons
 var showMinor = false;
 var showEnharmonics = false;
-var editing = false;
 var minorButtonPath;
 var enharmonicButtonPath;
 var minorButtonHovered;
@@ -42,10 +41,22 @@ var clearButtonPath;
 var clearButtonHovered;
 var clearButtonX;
 var clearButtonY;
+
 var editButtonX;
 var editButtonY;
-var editButtonHovered = false;
-var editDrop = 0;
+
+var deleteButtonPath;
+var upButtonPath;
+var downButtonPath;
+
+var deleteButtonHovered;
+var upButtonHovered;
+var downButtonHovered;
+
+var deleteMode = true
+var upMode = false
+var downMode = false
+
 
 var noteInputX;
 var noteInputY;
@@ -150,12 +161,30 @@ canvas.addEventListener('mousemove', function(e) {
         clearButtonHovered = true
         
     }else{clearButtonHovered = false}
-    if(ctx.isPointInPath(editButtonPath, e.offsetX * scale, e.offsetY * scale)){
+    // if(ctx.isPointInPath(editButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+    //     document.body.style.cursor = "pointer"
+    //     editButtonHovered = true
+        
+    // }else{editButtonHovered = false}
+    if(ctx.isPointInPath(deleteButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         document.body.style.cursor = "pointer"
-        editButtonHovered = true
+        deleteButtonHovered = true
         
-    }else{editButtonHovered = false}
+    }else{deleteButtonHovered = false}
+    if(ctx.isPointInPath(upButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        document.body.style.cursor = "pointer"
+        upButtonHovered = true
+        
+    }else{upButtonHovered = false}
+    if(ctx.isPointInPath(downButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        document.body.style.cursor = "pointer"
+        downButtonHovered = true
+        
+    }else{downButtonHovered = false}
 
     if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
 
@@ -220,6 +249,27 @@ canvas.addEventListener('mousedown', function(e) {
         
         notes = []
         chordNames = []
+        
+    }
+    if(ctx.isPointInPath(deleteButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        deleteMode = true
+        upMode = false
+        downMode = false
+        
+    }
+    if(ctx.isPointInPath(upButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        deleteMode = false
+        upMode = true
+        downMode = false
+        
+    }
+    if(ctx.isPointInPath(downButtonPath, e.offsetX * scale, e.offsetY * scale)){
+        
+        deleteMode = false
+        upMode = false
+        downMode = true
         
     }
 
@@ -613,29 +663,53 @@ function initButtons(){
     clearButtonY = y + h/2
 
     //edit button
-    editButtonPath = new Path2D()
+    deleteButtonPath = new Path2D()
 
     
     x += ((220/1440) * (canvas.width/scale));
+    y -= h * 1.5
 
     w = ((260/1440) * (canvas.width/scale))
+    h *= 3
 
     r = x + w;
     b = y + h;
     ctx.beginPath()
-    editButtonPath.moveTo(x+radius, y);
-    editButtonPath.lineTo(r-radius, y);
-    editButtonPath.quadraticCurveTo(r, y, r, y+radius);
-    editButtonPath.lineTo(r, y+h-radius);
-    editButtonPath.quadraticCurveTo(r, b, r-radius, b);
-    editButtonPath.lineTo(x+radius, b);
-    editButtonPath.quadraticCurveTo(x, b, x, b-radius);
-    editButtonPath.lineTo(x, y+radius);
-    editButtonPath.quadraticCurveTo(x, y, x+radius, y);
+    deleteButtonPath.moveTo(x+radius, y);
+    deleteButtonPath.lineTo(r-radius, y);
+    deleteButtonPath.quadraticCurveTo(r, y, r, y+radius);
+    deleteButtonPath.lineTo(r, y+h/3);
+    deleteButtonPath.lineTo(x, y+h/3);
+    deleteButtonPath.lineTo(x, y+radius);
+    deleteButtonPath.quadraticCurveTo(x,y, x+radius, y)
     ctx.closePath()
 
-    editButtonX = x + w/2
-    editButtonY = y + h/2
+    deleteButtonX = x + w/2
+    deleteButtonY = y + h/6
+
+    upButtonPath = new Path2D()
+    ctx.beginPath()
+    upButtonPath.rect(x, y+h/3, w, h/3)
+    ctx.closePath()
+
+    upButtonX = x + w/2
+    upButtonY = y + 3 * h/6
+
+    downButtonPath = new Path2D()
+    ctx.beginPath()
+    downButtonPath.moveTo(x, b - h/3)
+    downButtonPath.lineTo(r, b - h/3)
+    downButtonPath.lineTo(r, b-radius)
+    downButtonPath.quadraticCurveTo(r, b, r-radius, b);
+    downButtonPath.lineTo(x+radius, b);
+    downButtonPath.quadraticCurveTo(x, b, x, b-radius);
+    downButtonPath.lineTo(x, b - h/3);
+    ctx.closePath()
+
+    downButtonX = x + w/2
+    downButtonY = y + 5 * h/6
+
+    
 
 
 }
@@ -645,6 +719,7 @@ function drawButtons(){
     let strokeColor = "#001a35"
     let selectColor = "#ff7474"
     let hoveredFill = "#ffcccb"//#fffeb3
+    let hoveredFillAlt = "#ffde17"
 
     //button shapes
     ctx.fillStyle = "white"
@@ -672,6 +747,33 @@ function drawButtons(){
     ctx.fill(clearButtonPath)
 
     ctx.fillStyle = "white"
+    if(deleteButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    if(deleteMode){
+        ctx.fillStyle = selectColor
+    }
+    ctx.fill(deleteButtonPath)
+
+    ctx.fillStyle = "white"
+    if(upButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    if(upMode){
+        ctx.fillStyle = selectColor
+    }
+    ctx.fill(upButtonPath)
+
+    ctx.fillStyle = "white"
+    if(downButtonHovered){
+        ctx.fillStyle = hoveredFill
+    }
+    if(downMode){
+        ctx.fillStyle = selectColor
+    }
+    ctx.fill(downButtonPath)
+
+    ctx.fillStyle = "white"
 
 
     //button strokes
@@ -697,6 +799,36 @@ function drawButtons(){
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
+    ctx.stroke(deleteButtonPath)
+
+    if(deleteMode){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = strokeColor
+        ctx.stroke(deleteButtonPath)
+    }
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
+    ctx.stroke(upButtonPath)
+
+    if(upMode){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = strokeColor
+        ctx.stroke(upButtonPath)
+    }
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
+    ctx.stroke(downButtonPath)
+
+    if(downMode){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = strokeColor
+        ctx.stroke(downButtonPath)
+    }
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
     ctx.stroke(clearButtonPath)
 
     //button text
@@ -715,7 +847,21 @@ function drawButtons(){
     ctx.textAlign = "center"
     ctx.fillText("Clear Notes", clearButtonX, clearButtonY + (10/798) * canvas.height/scale)
 
-    drawEditButton()
+    ctx.fillStyle = "black"
+    ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Insert/Delete", deleteButtonX, deleteButtonY + (10/798) * canvas.height/scale)
+
+    ctx.fillStyle = "black"
+    ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Pitch Up", upButtonX, upButtonY + (10/798) * canvas.height/scale)
+
+    ctx.fillStyle = "black"
+    ctx.font = Math.floor((25/1440) * canvas.width/scale) + "px Arial"
+    ctx.textAlign = "center"
+    ctx.fillText("Pitch Down", downButtonX, downButtonY + (10/798) * canvas.height/scale)
+
 }
 
 function initNotesDisplay(){
@@ -749,17 +895,17 @@ function initNotesDisplay(){
 
 function drawNotesDisplay(){
 
-    ctx.fillStyle = "#005b96"
+    ctx.fillStyle = "#4D66AE"
     ctx.fill(noteDisplayPath)
 
     ctx.strokeStyle = "black"
     ctx.lineWidth = 1
     ctx.stroke(noteDisplayPath)
 
-    ctx.fillStyle = "white"
-    ctx.font = "20px Arial"
+    ctx.fillStyle = "Black"
+    ctx.font = Math.floor(20/798 * canvas.height/scale) + "px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Notes:", noteDisplayX + 200, noteDisplayY + 20)
+    ctx.fillText("Notes:", noteDisplayX + 200/1440 * canvas.width/scale, noteDisplayY + 20/798 * canvas.height/scale)
 
     let notesAsString = ""
 
@@ -775,7 +921,7 @@ function drawNotesDisplay(){
     notesAsString += ""
 
     ctx.textAlign = "center"
-    ctx.fillText(notesAsString, noteDisplayX + 200, noteDisplayY + 60)
+    ctx.fillText(notesAsString, noteDisplayX + 200/1440 * canvas.width/scale, noteDisplayY + 60/798 * canvas.height/scale)
 
 
     // ctx.fillStyle = "#001a35"
@@ -1472,6 +1618,7 @@ function determineChordType(root, currNotesTonal){
 
 function drawOutput(){
 
+    //rightside embellishment
     ctx.fillStyle = "#001a35"
     ctx.beginPath()
     ctx.rect(canvas.width/(2*scale), (720/798) * canvas.height/scale, canvas.width/scale, canvas.height/scale)
@@ -1496,14 +1643,14 @@ function drawOutput(){
     outputPath.lineTo(0, y);
     ctx.closePath()
 
-    ctx.strokeStyle = "black"
-    ctx.lineWidth = "2"
-    ctx.stroke(outputPath)
-    ctx.fillStyle = "#005b96"
+    // ctx.strokeStyle = "black"
+    // ctx.lineWidth = "2"
+    // ctx.stroke(outputPath)
+    ctx.fillStyle = "#4D66AE"//#21409a
     ctx.fill(outputPath)
 
-    ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
-    ctx.fillStyle = "white"
+    ctx.font = Math.floor((20/798) * (canvas.height/scale)) + "px Arial"
+    ctx.fillStyle = "black"
     ctx.textAlign = "left"
     if(notes.length == 0){
         ctx.fillText("Input notes on the staff to calculate a chord", ((10/1440) * (canvas.width/scale)), y + h/4)
@@ -1530,40 +1677,6 @@ function drawOutput(){
 
 }
 
-function drawEditButton(){
-
-    //draw path for button
-    let strokeColor = "#001a35"//"#ff5252"
-    let hoveredFill = "#ffcccb"
-
-    //button shapes
-    ctx.fillStyle = "white"
-    if(editButtonHovered){
-        ctx.fillStyle = hoveredFill
-    }
-    ctx.fill(editButtonPath)
-
-    //stroke edit button
-    //button strokes
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "black";
-    ctx.stroke(editButtonPath)
-
-    if(editing){
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = strokeColor
-        ctx.stroke(editButtonPath)
-    }
-
-    //draw arrow
-    //use svg image downloaded today
-    // ctx.drawImage(images[6], editButtonX - 140, editButtonY - 15, 30, 30)
-
-    //draw text
-
-
-}
-
 function drawCanvas(){
 
     //background color
@@ -1575,12 +1688,11 @@ function drawCanvas(){
 
     //embellishment
     ctx.beginPath()
-    ctx.moveTo(0, keyY + (250/1440) * canvas.width/scale)
-    ctx.lineTo(keyX, keyY + (250/1440) * canvas.width/scale)
-    ctx.arc(keyX, keyY, (250/1440) * canvas.width/scale, Math.PI/2, Math.PI * 1.25, true)
+    ctx.moveTo(0, keyY + (240/1440) * canvas.width/scale)
+    ctx.lineTo(keyX, keyY + (240/1440) * canvas.width/scale)
+    ctx.arc(keyX, keyY, (240/1440) * canvas.width/scale, Math.PI/2, Math.PI * 1.25, true)
     ctx.lineTo(-keyX + 125/1440 * canvas.width/scale, keyY)
-    // ctx.arc(keyX + (325/798) * canvas.height/scale * Math.cos(Math.PI * 1.75), keyY + (325/798) * canvas.height/scale * Math.sin(Math.PI * 1.75), (75/798) * canvas.height/scale, .8 * Math.PI, 1.5 * Math.PI, false)
-    ctx.strokeStyle = "#001a35"
+    ctx.strokeStyle = "#ff5252"
     ctx.lineWidth = 15/798 * canvas.height/scale
     ctx.stroke()
     ctx.fillStyle = "#001a35"
@@ -1591,6 +1703,9 @@ function drawCanvas(){
     ctx.beginPath()
     ctx.rect(0,0,canvas.width/scale, (65/798) * canvas.height/scale)
     ctx.fill()
+    // ctx.strokeStyle = "#ffde17"
+    // ctx.lineWidth = 4
+    // ctx.stroke()
     ctx.closePath()
 
     drawNotesDisplay()
@@ -1611,11 +1726,11 @@ function drawCanvas(){
     ctx.fillText("By Paul", ((25/1440) * (canvas.width/scale)), ((85/798) * (canvas.height/scale)))
     // ctx.fillText("Select key using", ((20/1440) * (canvas.width/scale)), ((150/798) * (canvas.height/scale)))
     // ctx.fillText("wheel:", ((20/1440) * (canvas.width/scale)), ((170/798) * (canvas.height/scale)))
-    ctx.fillStyle = "white"
-    ctx.fillText("Hover over box to insert chord notes below:", noteInputX, ((30/798) * canvas.height/scale))
+    ctx.fillStyle = "black"
+    ctx.fillText("Hover over box to insert chord notes below:", noteInputX, ((50/798) * canvas.height/scale))
 
     drawKeyWheel()
-    drawButtons()
+    
     
 
     ctx.fillStyle = "#ffeeee"
@@ -1626,7 +1741,7 @@ function drawCanvas(){
     
     drawOutput()
     drawStaff()
-
+    drawButtons()
     
 }
 
