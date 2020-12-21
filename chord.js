@@ -667,7 +667,6 @@ function initButtons(){
 
     
     x += ((220/1440) * (canvas.width/scale));
-    y -= h * 1.5
 
     w = ((260/1440) * (canvas.width/scale))
     h *= 3
@@ -870,9 +869,9 @@ function initNotesDisplay(){
     let startY = keyY - height/2
 
     let x = canvas.width/(2.5 * scale)
-    let y = startY - height * .4
+    let y = -50//startY - height * .4
     let w = 1000/1440 * canvas.width/scale
-    let h = 70/798 * canvas.height/scale
+    let h = 120/798 * canvas.height/scale
     let radius = h
 
     noteDisplayPath = new Path2D()
@@ -890,16 +889,16 @@ function initNotesDisplay(){
     ctx.closePath()
 
     noteDisplayX = x
-    noteDisplayY = y
+    noteDisplayY = y + 50
 }
 
 function drawNotesDisplay(){
 
-    ctx.fillStyle = "#4D66AE"
+    ctx.fillStyle = "#ff5252"
     ctx.fill(noteDisplayPath)
 
-    ctx.strokeStyle = "black"
-    ctx.lineWidth = 1
+    ctx.strokeStyle = "#001a35"
+    ctx.lineWidth = 10
     ctx.stroke(noteDisplayPath)
 
     ctx.fillStyle = "Black"
@@ -921,7 +920,7 @@ function drawNotesDisplay(){
     notesAsString += ""
 
     ctx.textAlign = "center"
-    ctx.fillText(notesAsString, noteDisplayX + 200/1440 * canvas.width/scale, noteDisplayY + 60/798 * canvas.height/scale)
+    ctx.fillText(notesAsString, noteDisplayX + 200/1440 * canvas.width/scale, noteDisplayY + 55/798 * canvas.height/scale)
 
 
     // ctx.fillStyle = "#001a35"
@@ -1021,7 +1020,7 @@ function drawStaff(){
     noteInputX = startX + width * .6
     noteInputY = startY - height * .25;
     ctx.beginPath()
-    noteInputPath.rect(noteInputX, noteInputY, width * .4, height * 1.7)
+    noteInputPath.rect(noteInputX, noteInputY, width * .4, height * 1.5)
     ctx.closePath()
 
     ctx.lineWidth = 0.5
@@ -1635,19 +1634,22 @@ function drawOutput(){
     let r = x + w;
     let b = y + h;
     ctx.beginPath()
-    outputPath.moveTo(0, y);
+    outputPath.moveTo(-50, y);
     outputPath.lineTo(r-radius, y);
     outputPath.quadraticCurveTo(r, y, r, b-radius);
     outputPath.lineTo(r, b);
-    outputPath.lineTo(0, b);
-    outputPath.lineTo(0, y);
+    outputPath.lineTo(-50, b);
+    outputPath.lineTo(-50, y);
     ctx.closePath()
 
     // ctx.strokeStyle = "black"
     // ctx.lineWidth = "2"
     // ctx.stroke(outputPath)
-    ctx.fillStyle = "#4D66AE"//#21409a
+    ctx.fillStyle = "#ffcccb"//#21409a
     ctx.fill(outputPath)
+    ctx.strokeStyle = "#ff5252"
+    ctx.lineWidth = 10
+    ctx.stroke(outputPath)
 
     ctx.font = Math.floor((20/798) * (canvas.height/scale)) + "px Arial"
     ctx.fillStyle = "black"
