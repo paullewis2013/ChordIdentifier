@@ -1645,14 +1645,14 @@ function drawOutput(){
     // ctx.strokeStyle = "black"
     // ctx.lineWidth = "2"
     // ctx.stroke(outputPath)
-    ctx.fillStyle = "#ffcccb"//#21409a
+    ctx.fillStyle = "#5a6b7d"//#21409a
     ctx.fill(outputPath)
-    ctx.strokeStyle = "#ff5252"
+    ctx.strokeStyle = "#001a35"
     ctx.lineWidth = 10
     ctx.stroke(outputPath)
 
     ctx.font = Math.floor((20/798) * (canvas.height/scale)) + "px Arial"
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "#ffeeee"
     ctx.textAlign = "left"
     if(notes.length == 0){
         ctx.fillText("Input notes on the staff to calculate a chord", ((10/1440) * (canvas.width/scale)), y + h/4)
