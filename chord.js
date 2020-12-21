@@ -597,7 +597,7 @@ function initButtons(){
     let x = keyX - ((210/1440) * (canvas.width/scale))
     let y = keyY + ((280/798) * (canvas.height/scale))
     let w = ((200/1440) * (canvas.width/scale))
-    let h = ((50/798) * (canvas.height/scale))
+    let h = ((35/798) * (canvas.height/scale))
     let radius = ((10/1440) * (canvas.width/scale))
 
     minorButtonPath = new Path2D()
@@ -669,7 +669,9 @@ function initButtons(){
     x += ((220/1440) * (canvas.width/scale));
 
     w = ((260/1440) * (canvas.width/scale))
+    y -= h
     h *= 3
+    
 
     r = x + w;
     b = y + h;
@@ -1345,20 +1347,25 @@ function drawStaff(){
 }
 
 //convert string to int where 0 = A up to 11 = G#
+// bb = double flat x = double sharp
 function noteToNum(note){
 
     let num = 0;
 
     switch(note){
+        case "Gx":
         case "A":
+        case "Bbb":
             num = 0;
             break;
 
         case "A#":
         case "Bb":
+        case "Cbb":
             num = 1;
             break;
 
+        case "Ax":
         case "B":
         case "Cb":
             num = 2;
@@ -1366,23 +1373,29 @@ function noteToNum(note){
 
         case "B#":
         case "C":
+        case "Dbb":
             num = 3;
             break;
         
+        case "Bx":
         case "C#":
         case "Db":
             num = 4
             break;
 
+        case "Cx":
         case "D":
+        case "Ebb":
             num = 5
             break;
 
         case "D#":
         case "Eb":
+        case "Fbb":
             num = 6
             break;
 
+        case "Dx":
         case "E":
         case "Fb":
             num = 7
@@ -1390,15 +1403,19 @@ function noteToNum(note){
 
         case "E#":
         case "F":
+        case "Gbb":
             num = 8
             break;
         
+        case "Ex":
         case "F#":
         case "Gb":
             num = 9
             break;
 
+        case "Fx":
         case "G":
+        case "Abb":
             num = 10
             break;
 
