@@ -189,10 +189,14 @@ canvas.addEventListener('mousemove', function(e) {
     if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
 
         document.body.style.cursor = "pointer"
+        
+        
         hoveredNote = true
         noteSnapped = false
 
         noteY = e.offsetY
+        
+        
 
     }else{hoveredNote = false}
 
@@ -276,35 +280,79 @@ canvas.addEventListener('mousedown', function(e) {
 
     if(hoveredNote){
 
-        let dup = false
-        let dupIndex = -1
+        if(deleteMode){
+            let dup = false
+            let dupIndex = -1
 
-        let height = canvas.height/(2 * scale)
-        noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+            let height = canvas.height/(2 * scale)
+            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
-        //make sure note isn't a duplicate
-        for(let i = 0; i < notes.length; i++){
-            if(Math.abs((notes[i].noteY) - noteY) < 1){
-                dup = true
-                dupIndex = i
+            //make sure note isn't a duplicate
+            for(let i = 0; i < notes.length; i++){
+                if(Math.abs((notes[i].noteY) - noteY) < 1){
+                    dup = true
+                    dupIndex = i
+                }
+            }
+
+            if(!dup && notes.length < 7){
+                notes.push({hoveredNoteName, noteY})
+
+                //every time a note is added re-sort the notes to be in acsending order
+                notes.sort((a, b) => (a.noteY < b.noteY) ? 1 : -1)
+
+                chordNames = calcChordNames()
+            }
+
+            if(dup){
+                notes.splice(dupIndex, 1)
+                chordNames = calcChordNames()
             }
         }
 
-        if(!dup && notes.length < 7){
-            notes.push({hoveredNoteName, noteY})
+        if(upMode){
+            let dup = false
+            let dupIndex = -1
 
-            //every time a note is added resort the notes to be in acsending order
-            notes.sort((a, b) => (a.noteY < b.noteY) ? 1 : -1)
+            let height = canvas.height/(2 * scale)
+            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
-            chordNames = calcChordNames()
+            //make sure note is a duplicate
+            for(let i = 0; i < notes.length; i++){
+                if(Math.abs((notes[i].noteY) - noteY) < 1){
+                    dup = true
+                    dupIndex = i
+                }
+            }
+
+            if(dup){
+                notes[dupIndex].hoveredNoteName = pitchUp(notes[dupIndex].hoveredNoteName)
+                chordNames = calcChordNames()
+            }
+            
+
         }
+        if(downMode){
+            let dup = false
+            let dupIndex = -1
 
-        if(dup){
-            notes.splice(dupIndex, 1)
-            chordNames = calcChordNames()
+            let height = canvas.height/(2 * scale)
+            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+
+            //make sure note is a duplicate
+            for(let i = 0; i < notes.length; i++){
+                if(Math.abs((notes[i].noteY) - noteY) < 1){
+                    dup = true
+                    dupIndex = i
+                }
+            }
+
+            if(dup){
+                notes[dupIndex].hoveredNoteName = pitchDown(notes[dupIndex].hoveredNoteName)
+                chordNames = calcChordNames()
+            }
         }
         
-        console.log(notes)
     }
 
 });
@@ -510,6 +558,48 @@ function calcKey(index, select){
 
 }
 
+function pitchUp(name){
+
+    if(name.length == 1){
+        return name + "#"
+    }
+
+    switch(name.substring(1)){
+        case "bb":
+            name = name.substring(0,2)
+            break;
+        case "b":
+            name = name.substring(0,1)
+            break;
+        case "#":
+            name = name.substring(0,1) + "x"
+            break;
+    }
+
+    return name
+}
+
+function pitchDown(name){
+
+    if(name.length == 1){
+        return name + "b"
+    }
+
+    switch(name.substring(1)){
+        case "x":
+            name = name.substring(0,1) + "#"
+            break;
+        case "#":
+            name = name.substring(0,1)
+            break;
+        case "b":
+            name = name.substring(0,1) + "bb"
+            break;
+    }
+
+    return name
+}
+
 function initKeyWheel(){
     
     paths = []
@@ -643,7 +733,9 @@ function initButtons(){
     //clear button
     clearButtonPath = new Path2D()
 
-    x = (canvas.width/(2.5 * scale))// + (canvas.width/scale - canvas.width/(8 * scale)))/2
+    x = (.57 * canvas.width/scale)// + (canvas.width/scale - canvas.width/(8 * scale)))/2
+    y += 3*h
+
 
     r = x + w;
     b = y + h;
@@ -666,10 +758,10 @@ function initButtons(){
     deleteButtonPath = new Path2D()
 
     
-    x += ((220/1440) * (canvas.width/scale));
+    x = (.78 * (canvas.width/scale));
 
     w = ((260/1440) * (canvas.width/scale))
-    y -= h
+    y -= 2*h
     h *= 3
     
 
@@ -802,31 +894,31 @@ function drawButtons(){
     ctx.strokeStyle = "black";
     ctx.stroke(deleteButtonPath)
 
-    if(deleteMode){
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = strokeColor
-        ctx.stroke(deleteButtonPath)
-    }
+    // if(deleteMode){
+    //     ctx.lineWidth = 4;
+    //     ctx.strokeStyle = strokeColor
+    //     ctx.stroke(deleteButtonPath)
+    // }
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
     ctx.stroke(upButtonPath)
 
-    if(upMode){
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = strokeColor
-        ctx.stroke(upButtonPath)
-    }
+    // if(upMode){
+    //     ctx.lineWidth = 4;
+    //     ctx.strokeStyle = strokeColor
+    //     ctx.stroke(upButtonPath)
+    // }
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
     ctx.stroke(downButtonPath)
 
-    if(downMode){
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = strokeColor
-        ctx.stroke(downButtonPath)
-    }
+    // if(downMode){
+    //     ctx.lineWidth = 4;
+    //     ctx.strokeStyle = strokeColor
+    //     ctx.stroke(downButtonPath)
+    // }
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
@@ -1115,24 +1207,24 @@ function drawStaff(){
         let noteName = "";
 
         //if(!noteSnapped){
-            noteY = Math.floor(noteY / (height * 0.05)) * (height * 0.05)
-            noteSnapped = true;
+        noteY = Math.floor(noteY / (height * 0.05)) * (height * 0.05)
+        noteSnapped = true;
 
-            let notePosition = Math.floor((startY + height * 1.55)/(height * 0.05) - noteY/(height * 0.05))
-            notePosition = notePosition % 7
-            notePosition -= 3
-            if(notePosition <= 0){notePosition += 7}
-            notePosition += 64
-            // console.log(String.fromCharCode(notePosition))
+        let notePosition = Math.floor((startY + height * 1.55)/(height * 0.05) - noteY/(height * 0.05))
+        notePosition = notePosition % 7
+        notePosition -= 3
+        if(notePosition <= 0){notePosition += 7}
+        notePosition += 64
+        // console.log(String.fromCharCode(notePosition))
 
-            noteName = String.fromCharCode(notePosition)
-            // console.log(notePosition)
+        noteName = String.fromCharCode(notePosition)
+        // console.log(notePosition)
 
-            noteName = determineNoteName(noteName)
-    
-            // console.log(noteName)
+        noteName = determineNoteName(noteName)
 
-            hoveredNoteName = noteName
+        // console.log(noteName)
+
+        hoveredNoteName = noteName
         // }
         
         
@@ -1253,7 +1345,7 @@ function drawStaff(){
         noteX = startX + width * .8
     }
 
-    if(hoveredNote){
+    if(hoveredNote && deleteMode){
 
         //ledger lines if necesary
 
@@ -1688,9 +1780,15 @@ function drawOutput(){
         
         printY += h/4
         
-        for(let i = 0; i < chordNames.length; i++){
-            ctx.fillText(chordNames[i], printX * 4, printY + i * h/(chordNames.length + 2))
+        if(chordNames.length > 0){
+            for(let i = 0; i < chordNames.length; i++){
+                ctx.fillText(chordNames[i], printX * 3.5, printY + i * h/(chordNames.length + 2))
+            }
+        }else{
+            ctx.font = Math.floor(h/5) + "px Arial"
+            ctx.fillText("Unrecognized", printX * 3.5, y + h/4)
         }
+        
     }
     
 
