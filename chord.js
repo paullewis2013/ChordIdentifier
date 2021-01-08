@@ -13,6 +13,17 @@ var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blu
 canvas.width = Math.floor(window.innerWidth * scale);
 canvas.height = Math.floor(window.innerHeight * scale);
 
+//scale down to preserve ratio on narrower devices
+if(window.innerHeight/window.innerWidth > 0.6){
+
+    canvas.height = window.innerWidth * scale * 0.6
+    canvas.style.height = window.innerWidth * 0.6 + "px"; 
+
+}
+
+
+
+
 // Normalize coordinate system to use css pixels.
 ctx.scale(scale, scale);
 
@@ -959,11 +970,8 @@ function drawButtons(){
 
 function initNotesDisplay(){
 
-    let height = canvas.height/(2 * scale)
-    let startY = keyY - height/2
-
     let x = canvas.width/(2.5 * scale)
-    let y = -50//startY - height * .4
+    let y = -50/798 * canvas.height/scale
     let w = 1000/1440 * canvas.width/scale
     let h = 120/798 * canvas.height/scale
     let radius = h
@@ -983,7 +991,7 @@ function initNotesDisplay(){
     ctx.closePath()
 
     noteDisplayX = x
-    noteDisplayY = y + 50
+    noteDisplayY = y + 50/798 * canvas.height/scale
 }
 
 function drawNotesDisplay(){
@@ -1772,17 +1780,17 @@ function drawOutput(){
         ctx.fillText("Possible Name(s):", ((10/1440) * (canvas.width/scale)), y + h/4)
         ctx.font = Math.floor(h/5) + "px Arial"
         let printX = ((70/1440) * (canvas.width/scale))
-        let printY = y + ((10/798) * (canvas.height/scale))
+        // let printY = y + ((10/798) * (canvas.height/scale))
         // ctx.fillText("Possible names:", printX, printY - h/10)
         
-        let fontH = Math.floor(h/(chordNames.length + 2))
+        let fontH = Math.floor((h - 10)/(chordNames.length + 2))
         ctx.font = fontH + "px Arial"
         
-        printY += h/4
+        // printY += h/4
         
         if(chordNames.length > 0){
             for(let i = 0; i < chordNames.length; i++){
-                ctx.fillText(chordNames[i], printX * 3.5, printY + i * h/(chordNames.length + 2))
+                ctx.fillText(chordNames[i], printX * 3.5, y + 10 + (i + 1) * fontH)
             }
         }else{
             ctx.font = Math.floor(h/5) + "px Arial"
