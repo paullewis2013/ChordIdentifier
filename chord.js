@@ -13,15 +13,15 @@ var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blu
 canvas.width = Math.floor(window.innerWidth * scale);
 canvas.height = Math.floor(window.innerHeight * scale);
 
-//scale down to preserve ratio on narrower devices
-if(window.innerHeight/window.innerWidth > 0.6){
+let idealRatio = 798/1440
 
-    canvas.height = window.innerWidth * scale * 0.6
-    canvas.style.height = window.innerWidth * 0.6 + "px"; 
+//scale down to preserve ratio on narrower devices
+if(window.innerHeight/window.innerWidth > idealRatio){
+
+    canvas.height = window.innerWidth * scale * idealRatio
+    canvas.style.height = window.innerWidth * idealRatio + "px"; 
 
 }
-
-
 
 
 // Normalize coordinate system to use css pixels.
@@ -1657,14 +1657,10 @@ function determineChordType(root, currNotesTonal){
 
         //triads
         case "0,3,7,":
-        case "3,7,0,":
-        case "7,0,3,":
             chordType += " Minor"
             break;
 
         case "0,4,7,":
-        case "4,7,0,":
-        case "7,4,0,":
             chordType += " Major"
             break;
 
@@ -1703,6 +1699,10 @@ function determineChordType(root, currNotesTonal){
             chordType += " Dominant Seventh"
             break;
 
+        case "0,4,8,10,":
+            chordType += " Dominant Seventh #5"
+            break;  
+
         case "0,4,7,11,":
         case "0,4,11,":
             chordType += " Major Seventh"
@@ -1721,6 +1721,47 @@ function determineChordType(root, currNotesTonal){
         case "0,3,6,10,":
             chordType += " Half Diminished Seventh"
             break;
+
+        //added tone chords
+        case "0,2,4,7,":
+            chordType += " add 9"
+            break;
+
+        case "0,2,4,7,":
+            chordType += " minor add 9"
+            break;
+
+        //chords w intervals above an octave wrapped around
+        case "0,2,4,7,11,":
+        case "0,2,4,11,":
+            chordType += " Major Ninth"
+            break;
+
+        case "0,2,3,7,10,":
+        case "0,2,3,10,":
+            chordType += " Minor Ninth"
+            break;
+
+        case "0,2,4,7,10,":
+        case "0,2,4,10,":
+            chordType += " Ninth"
+            break;
+
+        case "0,2,4,7,9,":
+            chordType += " Major (6/9)"
+            break;
+
+        case "0,2,3,7,9,":
+            chordType += " Minor (6/9)"
+            break;
+
+        case "0,2,4,5,7,11,":
+            chordType += " Major Eleventh"
+            break;
+        
+        case "0,2,4,6,7,9,11,":
+            chordType += " Major Thirteenth"
+            break;  
 
         default:
             chordType = "Unrecognized"
