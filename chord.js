@@ -68,19 +68,19 @@ var deleteMode = true
 var upMode = false
 var downMode = false
 
-
+var noteInputPath;
 var noteInputX;
 var noteInputY;
+var noteInputHeight;
+var noteInputWidth;
 
 var numSharps = 0;
 var numFlats = 0;
 var notes = [];
 
 var noteX = 0;
-var noteInputPath;
 var noteY;
-var hoveredNote = false;
-var noteSnapped = false;
+var hoveredNote = -1;
 var hoveredNoteName = "";
 
 var noteDisplayPath;
@@ -89,9 +89,13 @@ var noteDisplayY;
 
 var chordNames;
 
+
+var hitboxes;
+
 drawKeyWheel()
 initButtons()
 initNotesDisplay()
+initNoteHitboxes()
 
 function preloadImages(srcs, imgs) {
     
@@ -160,36 +164,35 @@ canvas.addEventListener('mousemove', function(e) {
         minorButtonHovered = true
         
     }else{minorButtonHovered = false}
+
     if(ctx.isPointInPath(enharmonicButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         document.body.style.cursor = "pointer"
         enharmonicButtonHovered = true
         
     }else{enharmonicButtonHovered = false}
+
     if(ctx.isPointInPath(clearButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         document.body.style.cursor = "pointer"
         clearButtonHovered = true
         
     }else{clearButtonHovered = false}
-    // if(ctx.isPointInPath(editButtonPath, e.offsetX * scale, e.offsetY * scale)){
-        
-    //     document.body.style.cursor = "pointer"
-    //     editButtonHovered = true
-        
-    // }else{editButtonHovered = false}
+
     if(ctx.isPointInPath(deleteButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         document.body.style.cursor = "pointer"
         deleteButtonHovered = true
         
     }else{deleteButtonHovered = false}
+
     if(ctx.isPointInPath(upButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         document.body.style.cursor = "pointer"
         upButtonHovered = true
         
     }else{upButtonHovered = false}
+
     if(ctx.isPointInPath(downButtonPath, e.offsetX * scale, e.offsetY * scale)){
         
         document.body.style.cursor = "pointer"
@@ -201,15 +204,20 @@ canvas.addEventListener('mousemove', function(e) {
 
         document.body.style.cursor = "pointer"
         
-        
-        hoveredNote = true
-        noteSnapped = false
+        hoveredNote = -1
 
-        noteY = e.offsetY
-        
-        
+        for(let i = 0; i < hitboxes.length; i++){
+            if(ctx.isPointInPath(hitboxes[i].h, e.offsetX * scale, e.offsetY * scale)){
+                noteY = hitboxes[i].y
+                hoveredNote = i
+                // ctx.strokeStyle = "green"
+                // ctx.stroke(hitboxes[i].h)
+            }
+        }
 
-    }else{hoveredNote = false}
+    }else{hoveredNote = -1}
+
+    
 
 });
 
@@ -289,14 +297,49 @@ canvas.addEventListener('mousedown', function(e) {
     }
 
 
-    if(hoveredNote){
+    //check in case mouse clicked without registering movement
+    if(ctx.isPointInPath(noteInputPath, e.offsetX * scale, e.offsetY * scale)){
+
+        document.body.style.cursor = "pointer"
+        
+        hoveredNote = -1
+
+        for(let i = 0; i < hitboxes.length; i++){
+            if(ctx.isPointInPath(hitboxes[i].h, e.offsetX * scale, e.offsetY * scale)){
+                noteY = hitboxes[i].y
+                hoveredNote = i
+                console.log("found")
+            }
+        }
+
+    }else{hoveredNote = -1}
+
+    if(hoveredNote >= 0){
+
+        let noteName = "";
+
+        let notePosition = hoveredNote % 7
+        notePosition -= 3
+        notePosition *= -1
+        if(notePosition <= 0){notePosition += 7}
+        notePosition += 64
+        // console.log(String.fromCharCode(notePosition))
+
+        noteName = String.fromCharCode(notePosition)
+        // console.log(notePosition)
+
+        noteName = determineNoteName(noteName)
+
+        // console.log(noteName)
+
+        hoveredNoteName = noteName  
 
         if(deleteMode){
             let dup = false
             let dupIndex = -1
 
-            let height = canvas.height/(2 * scale)
-            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+            // let height = canvas.height/(2 * scale)
+            // noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
             //make sure note isn't a duplicate
             for(let i = 0; i < notes.length; i++){
@@ -306,7 +349,8 @@ canvas.addEventListener('mousedown', function(e) {
                 }
             }
 
-            if(!dup && notes.length < 7){
+            if(!dup && notes.length < 12){
+                //TODO
                 notes.push({hoveredNoteName, noteY})
 
                 //every time a note is added re-sort the notes to be in acsending order
@@ -320,13 +364,12 @@ canvas.addEventListener('mousedown', function(e) {
                 chordNames = calcChordNames()
             }
         }
-
         if(upMode){
             let dup = false
             let dupIndex = -1
 
-            let height = canvas.height/(2 * scale)
-            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+            // let height = canvas.height/(2 * scale)
+            // noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
             //make sure note is a duplicate
             for(let i = 0; i < notes.length; i++){
@@ -347,8 +390,8 @@ canvas.addEventListener('mousedown', function(e) {
             let dup = false
             let dupIndex = -1
 
-            let height = canvas.height/(2 * scale)
-            noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
+            // let height = canvas.height/(2 * scale)
+            // noteY = (Math.floor(noteY / (height * 0.05)) * (height * 0.05))
 
             //make sure note is a duplicate
             for(let i = 0; i < notes.length; i++){
@@ -367,6 +410,48 @@ canvas.addEventListener('mousedown', function(e) {
     }
 
 });
+
+function initNoteHitboxes(){
+
+    //note input box spans from two octaves above middle C to two octaves below middle C
+    //29 ledger spaces and lines for input
+    hitboxes = []
+
+    //define borders (of staff area)
+    let startX = canvas.width/(2.5 * scale)
+    let endX = canvas.width/scale - canvas.width/(50 * scale)
+    let height = canvas.height/(2 * scale)
+    let startY =  keyY - height/2
+    let width = endX - startX;
+
+    //init note input path
+    noteInputPath = new Path2D();
+    noteInputX = startX + width * .6
+    noteInputY = startY - height * .25;
+    noteInputHeight = height * 1.5;
+    noteInputWidth = width * .4;
+    ctx.beginPath()
+    noteInputPath.rect(noteInputX, noteInputY, noteInputWidth, noteInputHeight)
+    ctx.closePath()
+
+    //first get height of noteinput box over number of notes
+    let hitboxH = noteInputHeight/30
+
+    for(let i = 0; i < 29; i++){
+        let h = new Path2D()
+
+        ctx.beginPath()
+        h.rect(noteInputX, noteInputY + i * hitboxH + hitboxH/2, noteInputWidth, hitboxH)
+        ctx.closePath()
+
+        let y = noteInputY + i * hitboxH + hitboxH
+
+        //push the hitbox to hitboxes global var
+        hitboxes.push({h, y})
+    }
+
+    console.log(hitboxes.length)
+}
 
 //updates key based on given index
 function calcKey(index, select){
@@ -1118,12 +1203,13 @@ function drawStaff(){
     let width = endX - startX;
 
 
-    noteInputPath = new Path2D();
-    noteInputX = startX + width * .6
-    noteInputY = startY - height * .25;
-    ctx.beginPath()
-    noteInputPath.rect(noteInputX, noteInputY, width * .4, height * 1.5)
-    ctx.closePath()
+    // noteInputPath = new Path2D();
+    // noteInputX = startX + width * .6
+    // noteInputY = startY - height * .25;
+    // noteInputHeight = height * 1.5;
+    // ctx.beginPath()
+    // noteInputPath.rect(noteInputX, noteInputY, width * .4, noteInputHeight)
+    // ctx.closePath()
 
     ctx.lineWidth = 0.5
     ctx.strokeStyle = "#001a35"
@@ -1210,17 +1296,13 @@ function drawStaff(){
     //draw notes in chord
     noteX = startX + width * .8
 
-    if(hoveredNote){
+    if(hoveredNote >= 0){
 
         let noteName = "";
 
-        //if(!noteSnapped){
-        noteY = Math.floor(noteY / (height * 0.05)) * (height * 0.05)
-        noteSnapped = true;
-
-        let notePosition = Math.floor((startY + height * 1.55)/(height * 0.05) - noteY/(height * 0.05))
-        notePosition = notePosition % 7
+        let notePosition = hoveredNote % 7
         notePosition -= 3
+        notePosition *= -1
         if(notePosition <= 0){notePosition += 7}
         notePosition += 64
         // console.log(String.fromCharCode(notePosition))
@@ -1232,11 +1314,7 @@ function drawStaff(){
 
         // console.log(noteName)
 
-        hoveredNoteName = noteName
-        // }
-        
-        
-
+        hoveredNoteName = noteName        
         
     }
 
@@ -1353,7 +1431,7 @@ function drawStaff(){
         noteX = startX + width * .8
     }
 
-    if(hoveredNote && deleteMode){
+    if(hoveredNote >= 0 && deleteMode){
 
         //ledger lines if necesary
 
@@ -1734,17 +1812,17 @@ function determineChordType(root, currNotesTonal){
         //chords w intervals above an octave wrapped around
         case "0,2,4,7,11,":
         case "0,2,4,11,":
-            chordType += " Major Ninth"
+            chordType += " Major 9"
             break;
 
         case "0,2,3,7,10,":
         case "0,2,3,10,":
-            chordType += " Minor Ninth"
+            chordType += " Minor 9"
             break;
 
         case "0,2,4,7,10,":
         case "0,2,4,10,":
-            chordType += " Ninth"
+            chordType += " 9"
             break;
 
         case "0,2,4,7,9,":
@@ -1756,11 +1834,29 @@ function determineChordType(root, currNotesTonal){
             break;
 
         case "0,2,4,5,7,11,":
-            chordType += " Major Eleventh"
+            chordType += " Major 11"
+            break;
+
+        case "0,2,3,5,7,10,":
+            chordType += " Minor 11"
+            break;
+
+        case "0,2,4,5,7,10,":
+            chordType += " 11"
             break;
         
-        case "0,2,4,6,7,9,11,":
-            chordType += " Major Thirteenth"
+        case "0,2,4,5,7,9,11,":
+        case "0,2,4,7,9,11,":
+            chordType += " Major 13"
+            break;  
+
+        case "0,2,3,5,7,9,10,":
+            chordType += " Minor 13"
+            break;  
+
+        case "0,2,4,5,7,9,10,":
+        case "0,2,4,7,9,10,":
+            chordType += " 13"
             break;  
 
         default:
@@ -1896,8 +1992,6 @@ function drawCanvas(){
     ctx.fillText("Hover over box to insert chord notes below:", noteInputX, ((50/798) * canvas.height/scale))
 
     drawKeyWheel()
-    
-    
 
     ctx.fillStyle = "#ffeeee"
     ctx.font = Math.floor((30/1440) * (canvas.width/scale)) + "px Arial"
@@ -1909,6 +2003,11 @@ function drawCanvas(){
     drawStaff()
     drawButtons()
     
+    //testing
+    // for(let i = 0; i < hitboxes.length; i++){
+    //     ctx.fillStyle = "green"
+    //     ctx.fill(hitboxes[i])
+    // }
 }
 
 //create a global object to track animation changes
@@ -1934,5 +2033,3 @@ function drawFrame(){
 
     drawCanvas()
 }
-
-
