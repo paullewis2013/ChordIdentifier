@@ -123,7 +123,8 @@ var imageSrcs = ["assets/treble.svg",
                 "assets/Sharp.png",
                 "assets/Natural.png",
                 "assets/Stemless notehead filled in.png",
-                "assets/arrow.svg"
+                "assets/arrow.svg",
+                "assets/Double sharp.png"
                 ];
 
 var images = [];
@@ -350,7 +351,6 @@ canvas.addEventListener('mousedown', function(e) {
             }
 
             if(!dup && notes.length < 12){
-                //TODO
                 notes.push({hoveredNoteName, noteY})
 
                 //every time a note is added re-sort the notes to be in acsending order
@@ -1202,15 +1202,6 @@ function drawStaff(){
     let startY =  keyY - height/2
     let width = endX - startX;
 
-
-    // noteInputPath = new Path2D();
-    // noteInputX = startX + width * .6
-    // noteInputY = startY - height * .25;
-    // noteInputHeight = height * 1.5;
-    // ctx.beginPath()
-    // noteInputPath.rect(noteInputX, noteInputY, width * .4, noteInputHeight)
-    // ctx.closePath()
-
     ctx.lineWidth = 0.5
     ctx.strokeStyle = "#001a35"
     ctx.stroke(noteInputPath)
@@ -1248,7 +1239,7 @@ function drawStaff(){
     //reset startY
     startY -= 11 * (height)/10
 
-    //draw vertical line on rightside of staff
+    //draw vertical line on right side of staff
     ctx.moveTo(endX, startY)
     ctx.lineTo(endX, startY + height)
 
@@ -1324,6 +1315,8 @@ function drawStaff(){
 
     let lastNoteShifted = false;
 
+    let lastNoteAccidental = false;
+
     //draw notes
     for(let i = 0; i < notes.length; i++){
 
@@ -1331,7 +1324,6 @@ function drawStaff(){
         noteX = startX + width * .8
         
         //draw ledger lines if necesary
-
         //middle c
         if(Math.abs(notes[i].noteY - (startY + height/2)) < 1){
             ctx.strokeStyle = "black"
@@ -1411,12 +1403,6 @@ function drawStaff(){
         }
 
 
-
-        // ctx.fillStyle = "black"
-        // ctx.beginPath()
-        // ctx.arc(noteX, notes[i].noteY, height * 0.05, 0, 2 * Math.PI, false)
-        // ctx.fill()
-
         //check if note above or below would overlap
         if((i > 0 && notes[i - 1].noteY - notes[i].noteY < height * .06) && !lastNoteShifted){
             noteX += width * .07
@@ -1429,6 +1415,50 @@ function drawStaff(){
         ctx.drawImage(images[5], noteX - notewidth/2, notes[i].noteY - height * .05, notewidth, height * .1)
 
         noteX = startX + width * .8
+
+        //determine if accidental needed
+        if(notes[i].hoveredNoteName != determineNoteName(notes[i].hoveredNoteName.substring(0,1))){
+            
+            accX = noteX - width/8
+            if(lastNoteAccidental){
+                accX = noteX - width/8 - height * .1
+            }
+            lastNoteAccidental = !lastNoteAccidental
+
+            let accidentalNeeded = "natural"
+            if(notes[i].hoveredNoteName.length != 1){
+                accidentalNeeded = notes[i].hoveredNoteName.substring(1)
+            }
+
+            console.log(accidentalNeeded)
+            
+            switch(accidentalNeeded){
+
+                case "x":
+                    ctx.drawImage(images[7], accX, notes[i].noteY - height * .04, height * .07, height * .08)
+                    break;
+
+                case "#":
+                    ctx.drawImage(images[3], accX, notes[i].noteY - height * .1, height * .07, height * .2)
+                    break;
+
+                case "natural":
+                    ctx.drawImage(images[4], accX, notes[i].noteY - height * .1, height * .07, height * .2)
+                    break;
+
+                case "b":
+                    ctx.drawImage(images[2], accX, notes[i].noteY - height * .15, height * .07, height * .2)
+                    break;
+
+                case "bb":
+                    ctx.drawImage(images[2], accX, notes[i].noteY - height * .15, height * .07, height * .2)
+                    ctx.drawImage(images[2], accX - height * .05, notes[i].noteY - height * .15, height * .07, height * .2)
+                    break;    
+
+                default:
+                    break;
+            }
+        }
     }
 
     if(hoveredNote >= 0 && deleteMode){
